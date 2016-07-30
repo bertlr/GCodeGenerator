@@ -1,6 +1,6 @@
 Manifest-Version: 1.0
 AutoUpdate-Show-In-Client: true
-OpenIDE-Module: org.roiderh.gcodefunctions
+OpenIDE-Module: org.roiderh.gcodegenerator
 OpenIDE-Module-Localizing-Bundle: org/roiderh/gcodegenerator/Bundle.properties
 OpenIDE-Module-Specification-Version: 1.0
 

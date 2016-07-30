@@ -33,7 +33,7 @@ import org.roiderh.gcodegeneratordialogs.DialogGenerateCode;
 
 @ActionID(
         category = "File",
-        id = "org.roiderh.gcodefunctions.GCodeGeneratorActionListener"
+        id = "org.roiderh.gcodegenerator.GCodeGeneratorActionListener"
 )
 @ActionRegistration(
         iconBase = "org/roiderh/gcodegenerator/hi22-gcode-generator.png",
