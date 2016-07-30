@@ -1,0 +1,125 @@
+/*
+ * Copyright (C) 2014 by Herbert Roider <herbert@roider.at>
+ * 
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ * 
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+/* gcode parser 
+
+/home/herbert/archiv/javacc-5.0/bin/javacc gcode.jj
+
+javacc version 5.0 is used
+
+
+*/
+options
+{
+  JAVA_UNICODE_ESCAPE = true;
+  ERROR_REPORTING = true;
+  DEBUG_TOKEN_MANAGER = false;
+
+
+  STATIC = false;
+  COMMON_TOKEN_ACTION = false;
+  JDK_VERSION = "1.7";
+  LOOKAHEAD = 1;
+  
+}
+
+PARSER_BEGIN(Gcodereader)
+package org.roiderh.gcodeviewer.lexer;
+import java.lang.String;
+public class Gcodereader {
+      Token x = null;
+}
+
+PARSER_END(Gcodereader)
+
+TOKEN_MGR_DECLS :
+{
+  StringBuilder x;
+}
+// Diese Zeichen ignorieren wir
+SKIP : { " " | "\t" | "\r" | "\n" }
+
+<DEFAULT>
+// ignore Linenumbers and Labels: "N10" or "MY_LABEL:" and the filename
+SKIP: 
+{
+        <LABEL: (["A"-"Z","0"-"9","_","-"])+ (":") 
+      |
+       ("N")(["0"-"9"])+
+    |
+        ("%")(("MPF")|("SPF"))(" ")*(["0"-"9"])+(("\n")|("\r"))
+>
+
+}
+
+
+// for Sinumerik to get the Parameter like "X = 3+5"
+< DEFAULT > MORE : { < STARTPARAM : (["A"-"Z"])+(["0"-"9"])* (" ")* ("=") > : IN_PARAM }
+
+< IN_PARAM > TOKEN : 
+{ 
+   < PARAM : ( (["A"-"Z","0"-"9",")"]) ( (" ")+ (["A"-"Z","0"-"9"])))
+   |
+   (("\n")|("\r")|(";"))
+    
+>  { matchedToken.image = image.toString().substring(0, image.toString().length()-1); matchedToken.image.trim(); input_stream.backup(1); } : DEFAULT 
+
+} 
+
+< IN_PARAM >  MORE : {  < TEXT : ~[] > }  
+
+// The Parameter without the assign character: "Z-3.5" or "G1"
+<DEFAULT>
+TOKEN: 
+{
+        <G: ("G")(["0"-"9"])+ >
+        | 
+        <SHORT_PARAM: ((["A"-"Z"])+ ("-")? (<DECIMAL_FLOATING_POINT_LITERAL>)) 
+           |
+             ((["A"-"Z"])(["0"-"9"])+ ) 
+
+             >
+
+}
+
+
+
+<DEFAULT>
+TOKEN :
+{
+ 
+<#DECIMAL_FLOATING_POINT_LITERAL:
+        (["0"-"9"])+ "." (["0"-"9"])* (<DECIMAL_EXPONENT>)? 
+      | "." (["0"-"9"])+ (<DECIMAL_EXPONENT>)? 
+      | (["0"-"9"])+ <DECIMAL_EXPONENT> 
+      | (["0"-"9"])+ (<DECIMAL_EXPONENT>)? 
+  >
+
+
+}
+
+
+TOKEN :
+{
+  < #DECIMAL_EXPONENT: ["e","E"] (["+","-"])? (["0"-"9"])+ >
+
+}
+
+
+
+
+
