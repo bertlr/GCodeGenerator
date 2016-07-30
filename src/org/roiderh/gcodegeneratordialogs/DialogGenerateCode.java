@@ -268,6 +268,7 @@ public class DialogGenerateCode extends javax.swing.JDialog implements ActionLis
         org.openide.awt.Mnemonics.setLocalizedText(jButtonOk, org.openide.util.NbBundle.getMessage(DialogGenerateCode.class, "DialogGenerateCode.jButtonOk.text")); // NOI18N
 
         org.openide.awt.Mnemonics.setLocalizedText(jButtonCancel, org.openide.util.NbBundle.getMessage(DialogGenerateCode.class, "DialogGenerateCode.jButtonCancel.text")); // NOI18N
+        jButtonCancel.setActionCommand(org.openide.util.NbBundle.getMessage(DialogGenerateCode.class, "DialogGenerateCode.jButtonCancel.actionCommand")); // NOI18N
 
         listPane.setLayout(new java.awt.GridBagLayout());
 
