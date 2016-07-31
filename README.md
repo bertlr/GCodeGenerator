@@ -22,7 +22,7 @@ Edit the parameters for roughing and click "Calculate"
 
 ![Create the code](screen_3.png )
 
-The created toolpath. Click on "G-Code" to show the generated g-code.
+The created toolpath. The green line is the contour from the selected g-code, the red line is the generated toolpath for roughing. Click on "G-Code" to show the generated g-code.
 
 ![graphic view of the toolpath](screen_4.png)
 
