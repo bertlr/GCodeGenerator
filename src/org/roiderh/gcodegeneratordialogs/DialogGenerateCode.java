@@ -167,6 +167,8 @@ public class DialogGenerateCode extends javax.swing.JDialog implements ActionLis
             double toolnoseradius = 0.4;
             double mat_allowance_x = 0.2;
             double mat_allowance_z = 0.1;
+            double plunging_angle = 45.0 * Math.PI / 180.0;
+            
             int control = 0;
             for (int i = 0; i < fc.arg.size(); i++) {
                 if (fc.arg.get(i).name.compareTo("depth") == 0) {
@@ -180,6 +182,9 @@ public class DialogGenerateCode extends javax.swing.JDialog implements ActionLis
                     mat_allowance_x = Double.parseDouble(jFormattedFields.get(i).getText().trim());
                 } else if (fc.arg.get(i).name.compareTo("mat_allowance_z") == 0) {
                     mat_allowance_z = Double.parseDouble(jFormattedFields.get(i).getText().trim());
+                } else if (fc.arg.get(i).name.compareTo("plunging_angle") == 0) {
+                    plunging_angle = Double.parseDouble(jFormattedFields.get(i).getText().trim());
+                    plunging_angle *= Math.PI / 180;
                 }
 
             }
@@ -197,7 +202,7 @@ public class DialogGenerateCode extends javax.swing.JDialog implements ActionLis
 
                 GcodeGenerator gcode = new GcodeGenerator();
                 gcode.control = control;
-                String txtGcode = gcode.rough(elements, depth, toolnoseradius, new Point2D(mat_allowance_z, mat_allowance_x));
+                String txtGcode = gcode.rough(elements, depth, toolnoseradius, new Point2D(mat_allowance_z, mat_allowance_x), plunging_angle);
 
                 JTextArea panelGCode = (JTextArea) (((JViewport) (((JScrollPane) this.tabOutput.getComponentAt(1)).getViewport()))).getView();
                 panelGCode.setText(txtGcode);

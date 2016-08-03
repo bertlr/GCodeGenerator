@@ -29,6 +29,12 @@
                 "defaultval": "0.1"
             },
             {
+                "type": "real",
+                "name": "plunging_angle",
+                "desc": "Eintauchwinkel",
+                "defaultval": "45"
+            },
+            {
                 "type": "int",
                 "name": "control",
                 "desc": "Steuerung: 0=840D, 1=810, für Commentare im Code",
