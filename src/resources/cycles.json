@@ -31,7 +31,7 @@
             {
                 "type": "real",
                 "name": "plunging_angle",
-                "desc": "Eintauchwinkel",
+                "desc": "Eintauchwinkel: 1° bis 90°",
                 "defaultval": "45"
             },
             {
