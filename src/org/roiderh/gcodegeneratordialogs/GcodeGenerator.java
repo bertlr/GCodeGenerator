@@ -68,7 +68,7 @@ public class GcodeGenerator {
 
         gcode += makeComment("Schneidenradius: " + String.valueOf(toolNoseRadius)) + "\n";
         gcode += makeComment("Aufmass x=" + String.valueOf(oversize.getY()) + " , z=" + String.valueOf(oversize.getX())) + "\n";
-        gcode += makeComment("Eintauchwinkel " +String.format(Locale.US, "X%.2f", plunging_angle * 180.0 / Math.PI)) + "\n";
+        gcode += makeComment("Eintauchwinkel " +String.format(Locale.US, "%.2f", plunging_angle * 180.0 / Math.PI)) + "\n";
 
         //gcode = "G0 X" + 2 * (startp.getY()) + " Z" + ((startp.getX()) + 0.3) + "; Startpunkt\n";
         gcode += this.rough_part(elements, depth, toolNoseRadius, oversize, max_x, max_y - depth, plunging_angle);
