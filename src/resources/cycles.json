@@ -80,6 +80,27 @@
 
         ]
 
+    },
+    {
+        "title": "Parallel",
+        "name": "parallel",
+        "desc": "Parallele Kontur",
+        "arg": [
+            {
+                "type": "real",
+                "name": "distance",
+                "desc": "Abstand der Kontur",
+                "defaultval": "0"
+            },
+            {
+                "type": "int",
+                "name": "control",
+                "desc": "Steuerung: 0=840D, 1=810, für Commentare im Code",
+                "defaultval": "0"
+            }
+
+        ]
+
     }
 
 

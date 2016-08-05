@@ -29,6 +29,7 @@ import javax.swing.text.html.HTMLEditorKit;
 import javax.swing.text.html.StyleSheet;
 import math.geom2d.circulinear.PolyCirculinearCurve2D;
 import org.roiderh.gcodegeneratordialogs.generators.Mirror;
+import org.roiderh.gcodegeneratordialogs.generators.Parallel;
 import org.roiderh.gcodegeneratordialogs.generators.Reverse;
 import org.roiderh.gcodegeneratordialogs.generators.Roughing;
 import org.roiderh.gcodeviewer.contourelement;
@@ -192,6 +193,9 @@ public class DialogGenerateCode extends javax.swing.JDialog implements ActionLis
 
                 }else if(fc.name.compareTo("reverse") == 0) {
                     Reverse m = new Reverse(origElements, fc, args);
+                    txtGcode = m.calculate();
+                }else if(fc.name.compareTo("parallel") == 0) {
+                    Parallel m = new Parallel(origElements, fc, args);
                     txtGcode = m.calculate();
                 }
 
