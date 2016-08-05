@@ -28,8 +28,8 @@ import java.util.LinkedList;
 import javax.swing.text.html.HTMLEditorKit;
 import javax.swing.text.html.StyleSheet;
 import math.geom2d.Point2D;
-import math.geom2d.circulinear.CirculinearElement2D;
 import math.geom2d.circulinear.PolyCirculinearCurve2D;
+import org.roiderh.gcodegeneratordialogs.generators.Roughing;
 import org.roiderh.gcodeviewer.contourelement;
 import org.roiderh.gcodeviewer.gcodereader;
 
@@ -164,46 +164,28 @@ public class DialogGenerateCode extends javax.swing.JDialog implements ActionLis
     public void actionPerformed(ActionEvent e) {
         if ("ok".equals(e.getActionCommand())) {
             java.util.ArrayList<String> args = new java.util.ArrayList<>();
-            double depth = 0.5;
-            double toolnoseradius = 0.4;
-            double mat_allowance_x = 0.2;
-            double mat_allowance_z = 0.1;
-            double plunging_angle = 45.0 * Math.PI / 180.0;
-            
-            int control = 0;
-            for (int i = 0; i < fc.arg.size(); i++) {
-                if (fc.arg.get(i).name.compareTo("depth") == 0) {
-                    depth = Double.parseDouble(jFormattedFields.get(i).getText().trim());
+            String txtGcode = "";
 
-                } else if (fc.arg.get(i).name.compareTo("toolnoseradius") == 0) {
-                    toolnoseradius = Double.parseDouble(jFormattedFields.get(i).getText().trim());
-                } else if (fc.arg.get(i).name.compareTo("control") == 0) {
-                    control = Integer.parseInt(jFormattedFields.get(i).getText().trim());
-                } else if (fc.arg.get(i).name.compareTo("mat_allowance_x") == 0) {
-                    mat_allowance_x = Double.parseDouble(jFormattedFields.get(i).getText().trim());
-                } else if (fc.arg.get(i).name.compareTo("mat_allowance_z") == 0) {
-                    mat_allowance_z = Double.parseDouble(jFormattedFields.get(i).getText().trim());
-                } else if (fc.arg.get(i).name.compareTo("plunging_angle") == 0) {
-                    plunging_angle = Double.parseDouble(jFormattedFields.get(i).getText().trim());
-                    plunging_angle *= Math.PI / 180;
-                }
+            for (int i = 0; i < fc.arg.size(); i++) {
+                args.add(i, jFormattedFields.get(i).getText().trim());
 
             }
 
-            InputStream is = new ByteArrayInputStream(this.g_code.getBytes());
-
-            LinkedList<contourelement> contour;
-            PolyCirculinearCurve2D elements;
+            PolyCirculinearCurve2D origElements;
             PolyCirculinearCurve2D newElements;
 
             try {
                 gcodereader gr = new gcodereader();
-                contour = gr.read(is);
-                elements = this.cleanup_contour(contour);
 
-                GcodeGenerator gcode = new GcodeGenerator();
-                gcode.control = control;
-                String txtGcode = gcode.rough(elements, depth, toolnoseradius, new Point2D(mat_allowance_z, mat_allowance_x), plunging_angle);
+                InputStream is = new ByteArrayInputStream(this.g_code.getBytes());
+                LinkedList<contourelement> origPath = gr.read(is);
+                origElements = this.cleanup_contour(origPath);
+
+                if (fc.name.compareTo("roughing") == 0) {
+                    Roughing r = new Roughing(origElements, fc, args);
+                    txtGcode = r.calculate();
+
+                }
 
                 JTextArea panelGCode = (JTextArea) (((JViewport) (((JScrollPane) this.tabOutput.getComponentAt(1)).getViewport()))).getView();
                 panelGCode.setText(txtGcode);
@@ -214,7 +196,7 @@ public class DialogGenerateCode extends javax.swing.JDialog implements ActionLis
                 newElements = this.cleanup_contour(newPath);
 
                 ContourPlot panelContour = (ContourPlot) this.tabOutput.getComponentAt(0);
-                panelContour.origElements = elements;
+                panelContour.origElements = origElements;
                 panelContour.newElements = newElements;
                 panelContour.repaint();
 
@@ -388,6 +370,7 @@ public class DialogGenerateCode extends javax.swing.JDialog implements ActionLis
         return elements;
 
     }
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JEditorPane descriptionArea;

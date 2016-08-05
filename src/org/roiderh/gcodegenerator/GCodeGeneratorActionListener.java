@@ -69,15 +69,15 @@ public final class GCodeGeneratorActionListener implements ActionListener {
 
             Reader reader = new InputStreamReader(GCodeGeneratorActionListener.class.getResourceAsStream("/resources/cycles.json"), "UTF-8");
             FunctionConf[] fc = gson.fromJson(reader, FunctionConf[].class);
-            FunctionConf generator = null;
+            FunctionConf generator_conf = null;
 
             DialogSelectGenerator nf = new DialogSelectGenerator(fc, org.openide.windows.WindowManager.getDefault().getMainWindow(), true);
             nf.setLocationRelativeTo(org.openide.windows.WindowManager.getDefault().getMainWindow());
             nf.setVisible(true);
-            generator = nf.generator;
+            generator_conf = nf.generator;
 
             
-            DialogGenerateCode btf = new DialogGenerateCode(selectedText, generator, org.openide.windows.WindowManager.getDefault().getMainWindow(), true);
+            DialogGenerateCode btf = new DialogGenerateCode(selectedText, generator_conf, org.openide.windows.WindowManager.getDefault().getMainWindow(), true);
             btf.setLocationRelativeTo(org.openide.windows.WindowManager.getDefault().getMainWindow());
             btf.setVisible(true);
            

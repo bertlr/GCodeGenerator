@@ -120,7 +120,7 @@ public class GcodeGenerator {
                 break;
             }
             if ((points.size() % 2) != 0) {
-                Exception newExcept = new Exception("size of intersection points is odd, line number " + String.valueOf(i));
+                Exception newExcept = new Exception("size of intersection points is odd: " + String.valueOf(points.size()) + ", line number: " + String.valueOf(i) + ", try to change the depth");
                 throw newExcept;
             }
 
@@ -134,8 +134,8 @@ public class GcodeGenerator {
             p1 = p2.translate(Math.abs(1.1 * depth) / Math.tan(plunging_angle), (1.1 * depth));
             p4 = p3.translate(Math.abs(0.7 * depth) / Math.tan(plunging_angle), (0.7 * depth));
 
-            if (p2.getX() - p3.getX() < 2 * tnrc) {
-                System.out.println("Eintauchen in Hinterschnitt macht keinen Sinn, weil Schneidenradius zu groß ist");
+            if (p2.getX() - p3.getX() < 0) {
+                //System.out.println("Eintauchen in Hinterschnitt macht keinen Sinn, weil Schneidenradius zu groß ist");
                 break;
             }
             System.out.println(p2.toString() + " -- " + p3.toString());

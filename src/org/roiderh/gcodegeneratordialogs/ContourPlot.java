@@ -19,12 +19,10 @@ package org.roiderh.gcodegeneratordialogs;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
-import java.util.LinkedList;
 import javax.swing.JPanel;
 import math.geom2d.AffineTransform2D;
 import math.geom2d.Box2D;
 import math.geom2d.Point2D;
-import math.geom2d.circulinear.CirculinearElement2D;
 import math.geom2d.circulinear.PolyCirculinearCurve2D;
 import math.geom2d.line.Line2D;
 
@@ -51,7 +49,15 @@ public class ContourPlot extends JPanel {
         Graphics2D g2d = (Graphics2D) g;
 
         PolyCirculinearCurve2D orig_curve = origElements;
-        Box2D bb = new Box2D(origElements.firstPoint(), origElements.lastPoint());
+        
+        // only to determine the bounding box of all 2 curves:
+        PolyCirculinearCurve2D closed_c = new PolyCirculinearCurve2D(origElements.curves());
+        closed_c.add(newElements);
+        // close curve:
+        closed_c.add(new Line2D(closed_c.lastPoint(), closed_c.firstPoint()));
+        
+        
+        Box2D bb = closed_c.boundingBox();
         //Box2D bb = orig_curve.boundingBox();
         double max_x = bb.getMaxX();
         double min_x = bb.getMinX();
