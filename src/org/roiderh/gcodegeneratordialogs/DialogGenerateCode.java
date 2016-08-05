@@ -29,6 +29,7 @@ import javax.swing.text.html.HTMLEditorKit;
 import javax.swing.text.html.StyleSheet;
 import math.geom2d.circulinear.PolyCirculinearCurve2D;
 import org.roiderh.gcodegeneratordialogs.generators.Mirror;
+import org.roiderh.gcodegeneratordialogs.generators.Reverse;
 import org.roiderh.gcodegeneratordialogs.generators.Roughing;
 import org.roiderh.gcodeviewer.contourelement;
 import org.roiderh.gcodeviewer.gcodereader;
@@ -189,6 +190,9 @@ public class DialogGenerateCode extends javax.swing.JDialog implements ActionLis
                     Mirror m = new Mirror(origElements, fc, args);
                     txtGcode = m.calculate();
 
+                }else if(fc.name.compareTo("reverse") == 0) {
+                    Reverse m = new Reverse(origElements, fc, args);
+                    txtGcode = m.calculate();
                 }
 
                 JTextArea panelGCode = (JTextArea) (((JViewport) (((JScrollPane) this.tabOutput.getComponentAt(1)).getViewport()))).getView();
