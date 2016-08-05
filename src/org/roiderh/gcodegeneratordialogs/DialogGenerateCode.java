@@ -29,6 +29,7 @@ import javax.swing.text.html.HTMLEditorKit;
 import javax.swing.text.html.StyleSheet;
 import math.geom2d.Point2D;
 import math.geom2d.circulinear.CirculinearElement2D;
+import math.geom2d.circulinear.PolyCirculinearCurve2D;
 import org.roiderh.gcodeviewer.contourelement;
 import org.roiderh.gcodeviewer.gcodereader;
 
@@ -192,8 +193,8 @@ public class DialogGenerateCode extends javax.swing.JDialog implements ActionLis
             InputStream is = new ByteArrayInputStream(this.g_code.getBytes());
 
             LinkedList<contourelement> contour;
-            LinkedList<CirculinearElement2D> elements;
-            LinkedList<CirculinearElement2D> newElements;
+            PolyCirculinearCurve2D elements;
+            PolyCirculinearCurve2D newElements;
 
             try {
                 gcodereader gr = new gcodereader();
@@ -368,8 +369,8 @@ public class DialogGenerateCode extends javax.swing.JDialog implements ActionLis
      * @param contour
      * @return
      */
-    private LinkedList<CirculinearElement2D> cleanup_contour(LinkedList<contourelement> contour) {
-        LinkedList<CirculinearElement2D> elements = new LinkedList<>();
+    private PolyCirculinearCurve2D cleanup_contour(LinkedList<contourelement> contour) {
+        PolyCirculinearCurve2D elements = new PolyCirculinearCurve2D();
         for (contourelement current_ce : contour) {
 
             if (current_ce.curve == null) {

@@ -37,28 +37,26 @@ public class ContourPlot extends JPanel {
     /**
      * The points to display
      */
-    
-    public LinkedList<CirculinearElement2D> origElements;
-    public LinkedList<CirculinearElement2D> newElements;
+    public PolyCirculinearCurve2D origElements;
+    public PolyCirculinearCurve2D newElements;
 
     private void doDrawing(Graphics g) {
-        if(this.origElements == null){
+        if (this.origElements == null) {
             return;
         }
-        
+
         int canvas_width = this.getWidth();
         int canvas_height = this.getHeight();
 
         Graphics2D g2d = (Graphics2D) g;
-        
-        PolyCirculinearCurve2D orig_curve = new PolyCirculinearCurve2D(origElements);
-        Box2D bb = new Box2D(origElements.getFirst().firstPoint(), origElements.getLast().lastPoint());
+
+        PolyCirculinearCurve2D orig_curve = origElements;
+        Box2D bb = new Box2D(origElements.firstPoint(), origElements.lastPoint());
         //Box2D bb = orig_curve.boundingBox();
         double max_x = bb.getMaxX();
         double min_x = bb.getMinX();
         double max_y = bb.getMaxY();
         double min_y = bb.getMinY();
-
 
         double middle_x = (max_x + min_x) / 2.0;
         double middle_y = (max_y + min_y) / 2.0;
@@ -78,14 +76,13 @@ public class ContourPlot extends JPanel {
 
         //g2d.setColor(Color.blue);
         //bb.transform(mir).transform(sca).transform(tra).draw(g2d);
-
         g2d.setColor(Color.green);
         orig_curve.transform(mir).transform(sca).transform(tra).draw(g2d);
-        
-        if(newElements == null){
+
+        if (newElements == null) {
             return;
         }
-        PolyCirculinearCurve2D new_curve = new PolyCirculinearCurve2D(newElements);
+        PolyCirculinearCurve2D new_curve = newElements;
         g2d.setColor(Color.RED);
         new_curve.transform(mir).transform(sca).transform(tra).draw(g2d);
 

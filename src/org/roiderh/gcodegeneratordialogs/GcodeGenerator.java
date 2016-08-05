@@ -17,11 +17,10 @@
 package org.roiderh.gcodegeneratordialogs;
 
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.Locale;
 import math.geom2d.Point2D;
-import math.geom2d.circulinear.CirculinearElement2D;
 import math.geom2d.circulinear.PolyCirculinearCurve2D;
+import math.geom2d.domain.PolyOrientedCurve2D;
 import math.geom2d.line.Line2D;
 import math.geom2d.line.LineSegment2D;
 
@@ -39,32 +38,34 @@ public class GcodeGenerator {
 
     /**
      *
-     * @param elements contour, y is the radius, x is the length
+     * @param _elements contour, y is the radius, x is the length
      * @param depth max depth in radius
      * @param toolNoseRadius
      * @param oversize Material allowance in x (z-axis) and y (x-axis)
      * @param plunging_angle in rad! 1 to 90 degree
      * @return G-code
      */
-    public String rough(LinkedList<CirculinearElement2D> _elements, double depth, double toolNoseRadius, Point2D oversize, double plunging_angle) throws Exception {
-        double max_x = _elements.getFirst().firstPoint().getX(); // z-achse
-        double max_y = _elements.getLast().lastPoint().getY(); // x-achse
+    public String rough(PolyCirculinearCurve2D _elements, double depth, double toolNoseRadius, Point2D oversize, double plunging_angle) throws Exception {
+        double max_x = _elements.firstPoint().getX(); // z-achse
+        double max_y = _elements.lastPoint().getY(); // x-achse
 
         String gcode = makeComment("Abspantiefe: " + String.valueOf(depth)) + "\n";
 
         // Innencontour:
-        if (_elements.getFirst().firstPoint().y() > _elements.getLast().lastPoint().y()) {
+        if (_elements.firstPoint().y() > _elements.lastPoint().y()) {
             depth *= -1.0;
             oversize = oversize.scale(1.0, -1.0);
         }
         
         // create a copy
-        LinkedList<CirculinearElement2D> elements = new LinkedList<>();
-        for(CirculinearElement2D e : _elements){
-            elements.add(e);
-        }
+        PolyCirculinearCurve2D elements = new PolyCirculinearCurve2D(_elements.curves());
+        
+        //elements;
+//        for(CirculinearElement2D e : _elements){
+//            elements.add(e);
+//        }
         // Am Anfang eine Linie anhängen, damit die Contour vorne geschlossen ist:
-        elements.add(0, new Line2D(new Point2D(elements.getFirst().firstPoint().x(), elements.getLast().lastPoint().y()), elements.getFirst().firstPoint()));
+        elements.add(0, new Line2D(new Point2D(elements.firstPoint().x(), elements.lastPoint().y()), elements.firstPoint()));
 
         gcode += makeComment("Schneidenradius: " + String.valueOf(toolNoseRadius)) + "\n";
         gcode += makeComment("Aufmass x=" + String.valueOf(oversize.getY()) + " , z=" + String.valueOf(oversize.getX())) + "\n";
@@ -72,8 +73,8 @@ public class GcodeGenerator {
 
         //gcode = "G0 X" + 2 * (startp.getY()) + " Z" + ((startp.getX()) + 0.3) + "; Startpunkt\n";
         gcode += this.rough_part(elements, depth, toolNoseRadius, oversize, max_x, max_y - depth, plunging_angle);
-        gcode += "G0 " + this.format("X", elements.getLast().lastPoint().getY() + oversize.getY()) + "\n";
-        gcode += "G0 " + this.format("Z", elements.getFirst().firstPoint().getX()) + "\n";
+        gcode += "G0 " + this.format("X", elements.lastPoint().getY() + 0.1 * depth + oversize.getY()) + "\n";
+        gcode += "G0 " + this.format("Z", elements.firstPoint().getX()) + "\n";
 
         gcode += makeComment("End of generated code") + "\n";
         System.out.print(gcode);
@@ -94,16 +95,16 @@ public class GcodeGenerator {
      * @return G-code
      * @throws Exception
      */
-    private String rough_part(LinkedList<CirculinearElement2D> elements, double depth, double toolNoseRadius, Point2D oversize, double max_x, double y_layer, double plunging_angle) throws Exception {
+    private String rough_part(PolyCirculinearCurve2D elements, double depth, double toolNoseRadius, Point2D oversize, double max_x, double y_layer, double plunging_angle) throws Exception {
         String gcode = "";
 
         double tnrc = toolNoseRadius * (1 + Math.tan(0.5 * plunging_angle)); // only for undercut elements to avoid a crash with the contour because of the tool nose radius
 
         Point2D new_startpoint = null;
 
-        PolyCirculinearCurve2D contour = new PolyCirculinearCurve2D(elements);
-
-        double min_x = elements.getLast().lastPoint().getX();
+        PolyOrientedCurve2D contour = new PolyOrientedCurve2D(elements);
+       
+        double min_x = elements.lastPoint().getX();
 
         for (int i = 0; i < 100; i++) {
             Point2D p1 = null;
@@ -147,7 +148,7 @@ public class GcodeGenerator {
 
         if (new_startpoint != null) {
             gcode += makeComment("neue Senke Startpunkt") + "\n";
-            gcode += "G0 " + this.format("X", (elements.getLast().lastPoint().getY()) + 0.1 * depth + oversize.getY()) + "\n";
+            gcode += "G0 " + this.format("X", (elements.lastPoint().getY()) + 0.1 * depth + oversize.getY()) + "\n";
             gcode += this.rough_part(elements, depth, toolNoseRadius, oversize, new_startpoint.getX(), new_startpoint.getY(), plunging_angle);
 
         }
