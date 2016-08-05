@@ -41,7 +41,7 @@ public class Roughing extends AbstractGenerator {
         double mat_allowance_x = 0.2;
         double mat_allowance_z = 0.1;
         double plunging_angle = 45.0 * Math.PI / 180.0;
-        int control = 0; // 0 for 840D, 1 for 810
+        control = 0; // 0 for 840D, 1 for 810
 
         for (int i = 0; i < fc.arg.size(); i++) {
             if (fc.arg.get(i).name.compareTo("depth") == 0) {

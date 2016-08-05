@@ -43,7 +43,29 @@
 
         ]
 
+    },
+    {
+        "title": "Spiegeln",
+        "name": "mirror",
+        "desc": "Spiegeln der Kontur",
+        "arg": [
+            {
+                "type": "int",
+                "name": "vertical",
+                "desc": "Vertikal spiegeln",
+                "defaultval": "0"
+            },
+            {
+                "type": "int",
+                "name": "control",
+                "desc": "Steuerung: 0=840D, 1=810, für Commentare im Code",
+                "defaultval": "0"
+            }
+
+        ]
+
     }
+
 
 
 ]

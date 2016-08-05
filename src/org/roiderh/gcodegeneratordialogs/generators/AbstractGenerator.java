@@ -18,7 +18,14 @@ package org.roiderh.gcodegeneratordialogs.generators;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
+import java.util.Locale;
+import math.geom2d.AffineTransform2D;
+import math.geom2d.Point2D;
+import math.geom2d.circulinear.CirculinearElement2D;
 import math.geom2d.circulinear.PolyCirculinearCurve2D;
+import math.geom2d.conic.CircleArc2D;
+import math.geom2d.domain.PolyOrientedCurve2D;
+import math.geom2d.line.Line2D;
 import org.roiderh.gcodegeneratordialogs.FunctionConf;
 import org.roiderh.gcodeviewer.contourelement;
 
@@ -32,13 +39,12 @@ public class AbstractGenerator {
     protected FunctionConf fc;
     protected ArrayList<String> values;
     protected PolyCirculinearCurve2D orig_contour;
+    protected int control = 0; // 0 = 840D, 1 = 810
 
     public AbstractGenerator(PolyCirculinearCurve2D _orig_contour, FunctionConf _fc, ArrayList<String> _values) {
         orig_contour = _orig_contour;
         fc = _fc;
         values = _values;
-
-       
 
     }
 
@@ -73,4 +79,69 @@ public class AbstractGenerator {
         return clean_contour;
 
     }
+
+    public String convert2gcode(PolyCirculinearCurve2D new_curve) {
+
+        String output_gcode = "";
+        //PolyOrientedCurve2D new_curve = this.orig_contour.transform(mir_center);
+        output_gcode += this.makeComment("Begin of generated contour") + "\n";
+        ArrayList<CirculinearElement2D> el = (ArrayList<CirculinearElement2D>) new_curve.curves();
+        for (int i = 0; i < el.size(); i++) {
+            CirculinearElement2D curve = (CirculinearElement2D) el.get(i);
+            if (i == 0) {
+                output_gcode += "G1 " + format("X", curve.firstPoint().getY()) + format("Z", curve.firstPoint().getX()) + "\n";
+            }
+            if (curve.toString().contains("CircleArc2D")) {
+                CircleArc2D c = (CircleArc2D) curve;
+                if (c.isDirect()) {
+                    output_gcode += "G3 ";
+                } else {
+                    output_gcode += "G2 ";
+                }
+                output_gcode += format("X", curve.lastPoint().getY()) + format("Z", curve.lastPoint().getX()) + format("R", c.supportingCircle().radius()) + "\n";
+            } else {
+                output_gcode += "G1 " + format("X", curve.lastPoint().getY()) + format("Z", curve.lastPoint().getX()) + "\n";
+            }
+        }
+        output_gcode += this.makeComment("End of generated contour") + "\n";
+        return output_gcode;
+    }
+
+    /**
+     *
+     * @param axis "X" or "Z"
+     * @param d value
+     * @return formatted String like: X2.52, the x-axis is converted from radius
+     * to diameter.
+     */
+    private String format(String axis, double d) {
+        if (axis == "x" || axis == "X") {
+            d *= 2.0;
+            return String.format(Locale.US, " X%.2f", d);
+        } else if (axis == "R") { // Radius
+            if (control == 1) { // 810
+                return String.format(Locale.US, " B%.2f", d);
+            } else {  // 840D
+                return String.format(Locale.US, " CR=%.2f", d);
+            }
+
+        } else {
+            return String.format(Locale.US, " Z%.2f", d);
+        }
+
+    }
+
+    /**
+     *
+     * @param text
+     * @return commented text like: "( I am a comment )"
+     */
+    private String makeComment(String text) {
+        if (control == 1) {
+            return " ( " + text + " ) ";
+        } else {
+            return " ; " + text;
+        }
+    }
+
 }
