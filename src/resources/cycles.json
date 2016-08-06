@@ -52,7 +52,7 @@
             {
                 "type": "int",
                 "name": "vertical",
-                "desc": "Vertikal spiegeln",
+                "desc": "spiegeln: vertical: 1, horizontal: 0",
                 "defaultval": "0"
             },
             {
