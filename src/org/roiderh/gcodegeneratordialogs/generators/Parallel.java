@@ -7,7 +7,6 @@ package org.roiderh.gcodegeneratordialogs.generators;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import math.geom2d.AffineTransform2D;
 import math.geom2d.Point2D;
 import math.geom2d.circulinear.CirculinearCurve2D;
 import math.geom2d.circulinear.CirculinearCurves2D;
@@ -18,7 +17,6 @@ import math.geom2d.circulinear.buffer.RoundCapFactory;
 import math.geom2d.circulinear.buffer.RoundJoinFactory;
 import math.geom2d.conic.CircleArc2D;
 import math.geom2d.domain.PolyOrientedCurve2D;
-import math.geom2d.line.Line2D;
 import math.geom2d.line.LineSegment2D;
 import org.roiderh.gcodegeneratordialogs.FunctionConf;
 import org.roiderh.gcodeviewer.geometry;

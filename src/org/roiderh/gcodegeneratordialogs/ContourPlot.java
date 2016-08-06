@@ -24,6 +24,7 @@ import math.geom2d.AffineTransform2D;
 import math.geom2d.Box2D;
 import math.geom2d.Point2D;
 import math.geom2d.circulinear.PolyCirculinearCurve2D;
+import math.geom2d.conic.Circle2D;
 import math.geom2d.line.Line2D;
 
 /**
@@ -49,14 +50,13 @@ public class ContourPlot extends JPanel {
         Graphics2D g2d = (Graphics2D) g;
 
         PolyCirculinearCurve2D orig_curve = origElements;
-        
+
         // only to determine the bounding box of all 2 curves:
         PolyCirculinearCurve2D closed_c = new PolyCirculinearCurve2D(origElements.curves());
         closed_c.add(newElements);
         // close curve:
         closed_c.add(new Line2D(closed_c.lastPoint(), closed_c.firstPoint()));
-        
-        
+
         Box2D bb = closed_c.boundingBox();
         //Box2D bb = orig_curve.boundingBox();
         double max_x = bb.getMaxX();
@@ -91,6 +91,9 @@ public class ContourPlot extends JPanel {
         PolyCirculinearCurve2D new_curve = newElements;
         g2d.setColor(Color.RED);
         new_curve.transform(mir).transform(sca).transform(tra).draw(g2d);
+        double radius = 5;
+        Circle2D ende = new Circle2D(new_curve.lastPoint(), radius / fact);
+        ende.transform(mir).transform(sca).transform(tra).draw(g2d);
 
     }
 

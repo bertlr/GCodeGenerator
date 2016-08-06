@@ -70,7 +70,6 @@
         "name": "reverse",
         "desc": "Kontur in umgekehrter Richtung abfahren",
         "arg": [
-            
             {
                 "type": "int",
                 "name": "control",
