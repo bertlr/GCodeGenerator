@@ -38,13 +38,24 @@ public class AbstractGenerator {
     protected PolyCirculinearCurve2D orig_contour;
     protected int control = 0; // 0 = 840D, 1 = 810
 
+    /**
+     *
+     * @param _orig_contour Contur
+     * @param _fc Parameter description
+     * @param _values Parameters
+     */
     public AbstractGenerator(PolyCirculinearCurve2D _orig_contour, FunctionConf _fc, ArrayList<String> _values) {
         orig_contour = _orig_contour;
         fc = _fc;
         values = _values;
-
     }
 
+    /**
+     *
+     *
+     * @return g-code
+     * @throws Exception
+     */
     public String calculate() throws Exception {
 
         return "";
