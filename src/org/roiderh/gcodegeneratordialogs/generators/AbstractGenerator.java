@@ -104,7 +104,7 @@ public class AbstractGenerator {
                 curX = curve.firstPoint().getX();
                 curY = curve.firstPoint().getY();
 
-                output_gcode += "G1 " + format("X", curY) + format("Z", curX) + "\n";
+                output_gcode += "G1" + format("X", curY) + format("Z", curX) + "\n";
                 prevX = curX;
                 prevY = curY;
 
