@@ -173,29 +173,29 @@ public class DialogGenerateCode extends javax.swing.JDialog implements ActionLis
 
             }
 
-            PolyCirculinearCurve2D origElements;
-            PolyCirculinearCurve2D newElements;
+            PolyCirculinearCurve2D origCurve;
+            PolyCirculinearCurve2D newCurve;
 
             try {
                 gcodereader gr = new gcodereader();
 
                 InputStream is = new ByteArrayInputStream(this.g_code.getBytes());
                 LinkedList<contourelement> origPath = gr.read(is);
-                origElements = this.cleanup_contour(origPath);
+                origCurve = this.cleanup_contour(origPath);
 
                 if (fc.name.compareTo("roughing") == 0) {
-                    Roughing r = new Roughing(origElements, fc, args);
+                    Roughing r = new Roughing(origCurve, fc, args);
                     txtGcode = r.calculate();
 
                 }else if(fc.name.compareTo("mirror") == 0) {
-                    Mirror m = new Mirror(origElements, fc, args);
+                    Mirror m = new Mirror(origCurve, fc, args);
                     txtGcode = m.calculate();
 
                 }else if(fc.name.compareTo("reverse") == 0) {
-                    Reverse m = new Reverse(origElements, fc, args);
+                    Reverse m = new Reverse(origCurve, fc, args);
                     txtGcode = m.calculate();
                 }else if(fc.name.compareTo("parallel") == 0) {
-                    Parallel m = new Parallel(origElements, fc, args);
+                    Parallel m = new Parallel(origCurve, fc, args);
                     txtGcode = m.calculate();
                 }
 
@@ -205,11 +205,11 @@ public class DialogGenerateCode extends javax.swing.JDialog implements ActionLis
                 InputStream is_new = new ByteArrayInputStream(txtGcode.getBytes());
                 LinkedList<contourelement> newPath = gr.read(is_new);
 
-                newElements = this.cleanup_contour(newPath);
+                newCurve = this.cleanup_contour(newPath);
 
                 ContourPlot panelContour = (ContourPlot) this.tabOutput.getComponentAt(0);
-                panelContour.origElements = origElements;
-                panelContour.newElements = newElements;
+                panelContour.origCurve = origCurve;
+                panelContour.newCurve = newCurve;
                 panelContour.repaint();
 
             } catch (Exception e1) {

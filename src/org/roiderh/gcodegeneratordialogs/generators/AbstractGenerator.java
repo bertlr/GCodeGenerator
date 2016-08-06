@@ -19,17 +19,14 @@ package org.roiderh.gcodegeneratordialogs.generators;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.Locale;
-import math.geom2d.AffineTransform2D;
-import math.geom2d.Point2D;
 import math.geom2d.circulinear.CirculinearElement2D;
 import math.geom2d.circulinear.PolyCirculinearCurve2D;
 import math.geom2d.conic.CircleArc2D;
-import math.geom2d.domain.PolyOrientedCurve2D;
-import math.geom2d.line.Line2D;
 import org.roiderh.gcodegeneratordialogs.FunctionConf;
 import org.roiderh.gcodeviewer.contourelement;
 
 /**
+ * Base Class for Generators
  *
  * @author Herbert Roider <herbert@roider.at>
  */
@@ -79,29 +76,58 @@ public class AbstractGenerator {
         return clean_contour;
 
     }
-
+    /**
+     * convert the curve to a g-code
+     * @param new_curve
+     * @return g-code
+     */
     public String convert2gcode(PolyCirculinearCurve2D new_curve) {
 
         String output_gcode = "";
+        double prevX = 0.0;
+        double prevY = 0.0;
+        double curX;
+        double curY;
         //PolyOrientedCurve2D new_curve = this.orig_contour.transform(mir_center);
         output_gcode += this.makeComment("Begin of generated contour") + "\n";
         ArrayList<CirculinearElement2D> el = (ArrayList<CirculinearElement2D>) new_curve.curves();
         for (int i = 0; i < el.size(); i++) {
             CirculinearElement2D curve = (CirculinearElement2D) el.get(i);
             if (i == 0) {
-                output_gcode += "G1 " + format("X", curve.firstPoint().getY()) + format("Z", curve.firstPoint().getX()) + "\n";
+                curX = curve.firstPoint().getX();
+                curY = curve.firstPoint().getY();
+
+                output_gcode += "G1 " + format("X", curY) + format("Z", curX) + "\n";
+                prevX = curX;
+                prevY = curY;
+
             }
+            curX = curve.lastPoint().getX();
+            curY = curve.lastPoint().getY();
+
             if (curve.toString().contains("CircleArc2D")) {
                 CircleArc2D c = (CircleArc2D) curve;
                 if (c.isDirect()) {
-                    output_gcode += "G3 ";
+                    output_gcode += "G3";
                 } else {
-                    output_gcode += "G2 ";
+                    output_gcode += "G2";
                 }
-                output_gcode += format("X", curve.lastPoint().getY()) + format("Z", curve.lastPoint().getX()) + format("R", c.supportingCircle().radius()) + "\n";
+                output_gcode += format("R", c.supportingCircle().radius());
+
             } else {
-                output_gcode += "G1 " + format("X", curve.lastPoint().getY()) + format("Z", curve.lastPoint().getX()) + "\n";
+                output_gcode += "G1";
             }
+            if (Math.abs(curY-prevY) > 0.001) {
+                output_gcode += format("X", curY);
+            }
+            if (Math.abs(curX-prevX) > 0.001) {
+                output_gcode += format("Z", curX);
+            }
+            output_gcode += "\n";
+
+            prevX = curX;
+            prevY = curY;
+
         }
         output_gcode += this.makeComment("End of generated contour") + "\n";
         return output_gcode;
@@ -109,7 +135,7 @@ public class AbstractGenerator {
 
     /**
      *
-     * @param axis "X" or "Z"
+     * @param axis "X", "Z" or "R"
      * @param d value
      * @return formatted String like: X2.52, the x-axis is converted from radius
      * to diameter.

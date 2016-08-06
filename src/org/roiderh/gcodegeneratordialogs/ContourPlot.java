@@ -34,13 +34,13 @@ import math.geom2d.line.Line2D;
 public class ContourPlot extends JPanel {
 
     /**
-     * The points to display
+     * The curves to display
      */
-    public PolyCirculinearCurve2D origElements;
-    public PolyCirculinearCurve2D newElements;
+    public PolyCirculinearCurve2D origCurve;
+    public PolyCirculinearCurve2D newCurve;
 
     private void doDrawing(Graphics g) {
-        if (this.origElements == null) {
+        if (this.origCurve == null) {
             return;
         }
 
@@ -49,16 +49,15 @@ public class ContourPlot extends JPanel {
 
         Graphics2D g2d = (Graphics2D) g;
 
-        PolyCirculinearCurve2D orig_curve = origElements;
+        PolyCirculinearCurve2D orig_curve = origCurve;
 
         // only to determine the bounding box of all 2 curves:
-        PolyCirculinearCurve2D closed_c = new PolyCirculinearCurve2D(origElements.curves());
-        closed_c.add(newElements);
-        // close curve:
+        PolyCirculinearCurve2D closed_c = new PolyCirculinearCurve2D(origCurve.curves());
+        closed_c.add(newCurve);
+        // close curve for the boundingBox, otherwise last elements are not included, don't know why:
         closed_c.add(new Line2D(closed_c.lastPoint(), closed_c.firstPoint()));
 
         Box2D bb = closed_c.boundingBox();
-        //Box2D bb = orig_curve.boundingBox();
         double max_x = bb.getMaxX();
         double min_x = bb.getMinX();
         double max_y = bb.getMaxY();
@@ -80,18 +79,17 @@ public class ContourPlot extends JPanel {
         AffineTransform2D tra = AffineTransform2D.createTranslation(x_trans, y_trans);
         AffineTransform2D mir = AffineTransform2D.createLineReflection(new Line2D(new Point2D(0, middle_y), new Point2D(1, middle_y)));
 
-        //g2d.setColor(Color.blue);
-        //bb.transform(mir).transform(sca).transform(tra).draw(g2d);
         g2d.setColor(Color.green);
         orig_curve.transform(mir).transform(sca).transform(tra).draw(g2d);
 
-        if (newElements == null) {
+        if (newCurve == null) {
             return;
         }
-        PolyCirculinearCurve2D new_curve = newElements;
+        PolyCirculinearCurve2D new_curve = newCurve;
         g2d.setColor(Color.RED);
         new_curve.transform(mir).transform(sca).transform(tra).draw(g2d);
-        double radius = 5;
+        // draw a circle at the end of the curve
+        double radius = 3;
         Circle2D ende = new Circle2D(new_curve.lastPoint(), radius / fact);
         ende.transform(mir).transform(sca).transform(tra).draw(g2d);
 
