@@ -76,8 +76,10 @@ public class AbstractGenerator {
         return clean_contour;
 
     }
+
     /**
      * convert the curve to a g-code
+     *
      * @param new_curve
      * @return g-code
      */
@@ -88,7 +90,12 @@ public class AbstractGenerator {
         double prevY = 0.0;
         double curX;
         double curY;
-        //PolyOrientedCurve2D new_curve = this.orig_contour.transform(mir_center);
+
+        output_gcode += makeComment(fc.title.trim()) + "\n";
+        for (int i = 0; i < fc.arg.size(); i++) {
+            output_gcode += this.makeComment(fc.arg.get(i).name + "=" + values.get(i).trim()) + "\n";
+        }
+
         output_gcode += this.makeComment("Begin of generated contour") + "\n";
         ArrayList<CirculinearElement2D> el = (ArrayList<CirculinearElement2D>) new_curve.curves();
         for (int i = 0; i < el.size(); i++) {
@@ -117,10 +124,10 @@ public class AbstractGenerator {
             } else {
                 output_gcode += "G1";
             }
-            if (Math.abs(curY-prevY) > 0.001) {
+            if (Math.abs(curY - prevY) > 0.001) {
                 output_gcode += format("X", curY);
             }
-            if (Math.abs(curX-prevX) > 0.001) {
+            if (Math.abs(curX - prevX) > 0.001) {
                 output_gcode += format("Z", curX);
             }
             output_gcode += "\n";
