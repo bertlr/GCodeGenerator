@@ -32,6 +32,7 @@ import org.roiderh.gcodegeneratordialogs.generators.Mirror;
 import org.roiderh.gcodegeneratordialogs.generators.Parallel;
 import org.roiderh.gcodegeneratordialogs.generators.Reverse;
 import org.roiderh.gcodegeneratordialogs.generators.Roughing;
+import org.roiderh.gcodegeneratordialogs.generators.Translate;
 import org.roiderh.gcodeviewer.contourelement;
 import org.roiderh.gcodeviewer.gcodereader;
 
@@ -196,6 +197,10 @@ public class DialogGenerateCode extends javax.swing.JDialog implements ActionLis
                     txtGcode = m.calculate();
                 }else if(fc.name.compareTo("parallel") == 0) {
                     Parallel m = new Parallel(origCurve, fc, args);
+                    txtGcode = m.calculate();
+                
+                }else if(fc.name.compareTo("translate") == 0) {
+                    Translate m = new Translate(origCurve, fc, args);
                     txtGcode = m.calculate();
                 }
 
