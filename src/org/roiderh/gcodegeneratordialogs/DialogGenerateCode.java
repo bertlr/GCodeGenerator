@@ -202,6 +202,9 @@ public class DialogGenerateCode extends javax.swing.JDialog implements ActionLis
                 }else if(fc.name.compareTo("translate") == 0) {
                     Translate m = new Translate(origCurve, fc, args);
                     txtGcode = m.calculate();
+                }else{
+                    JOptionPane.showMessageDialog(null, "Error: no valid generator" );
+                    return;
                 }
 
                 JTextArea panelGCode = (JTextArea) (((JViewport) (((JScrollPane) this.tabOutput.getComponentAt(1)).getViewport()))).getView();
