@@ -27,7 +27,12 @@ import org.roiderh.gcodegeneratordialogs.FunctionConf;
  * @author Herbert Roider <herbert@roider.at>
  */
 public class Translate extends AbstractGenerator {
-
+    /**
+     * 
+     * @param _orig_contour
+     * @param _fc
+     * @param _values 
+     */
     public Translate(PolyCirculinearCurve2D _orig_contour, FunctionConf _fc, ArrayList<String> _values) {
         super(_orig_contour, _fc, _values);
 
