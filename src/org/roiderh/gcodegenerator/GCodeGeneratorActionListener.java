@@ -75,6 +75,9 @@ public final class GCodeGeneratorActionListener implements ActionListener {
             nf.setLocationRelativeTo(org.openide.windows.WindowManager.getDefault().getMainWindow());
             nf.setVisible(true);
             generator_conf = nf.generator;
+            if(generator_conf == null){
+                return;
+            }
 
             
             DialogGenerateCode btf = new DialogGenerateCode(selectedText, generator_conf, org.openide.windows.WindowManager.getDefault().getMainWindow(), true);

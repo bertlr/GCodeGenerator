@@ -50,7 +50,7 @@ public class DialogSelectGenerator extends javax.swing.JDialog {
 
         functionConfigTitles = new javax.swing.DefaultListModel<>();
         for (int i = 0; i < fc.length; i++) {
-            functionConfigTitles.add(i, this.fc[i].title + " " + this.fc[i].name);
+            functionConfigTitles.add(i, org.openide.util.NbBundle.getMessage(DialogSelectGenerator.class, "cycles." + fc[i].name + ".title"));
         }
         initComponents();
 
@@ -157,7 +157,7 @@ public class DialogSelectGenerator extends javax.swing.JDialog {
             return;
         }
         this.generator = fc[index];
-        textFunctionDesc.setText("<p>" + fc[index].desc + "</p>\n");
+        textFunctionDesc.setText("<p>" + org.openide.util.NbBundle.getMessage(DialogSelectGenerator.class, "cycles." + fc[index].name + ".desc") + "</p>\n");
     }//GEN-LAST:event_listFunctionsValueChanged
 
     private void jButtonOkActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonOkActionPerformed

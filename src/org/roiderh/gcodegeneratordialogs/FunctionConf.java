@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package org.roiderh.gcodegeneratordialogs;
 
 import java.util.ArrayList;
@@ -24,21 +23,18 @@ import java.util.ArrayList;
  * @author Herbert Roider <herbert@roider.at>
  */
 public class FunctionConf {
-    
 
     public class ArgConf {
-        
+
         public String name = "";
         /**
          * Possible values are "string", "real" and "int"
          */
         public String type = "string";
-        public String desc = "";
         public String defaultval = "";
 
     }
-    public String title = "";
+
     public String name = "";
-    public String desc = "";
     public ArrayList<ArgConf> arg;
 }

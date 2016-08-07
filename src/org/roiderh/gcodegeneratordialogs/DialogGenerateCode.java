@@ -101,7 +101,7 @@ public class DialogGenerateCode extends javax.swing.JDialog implements ActionLis
 
         }
 
-        this.setTitle(fc.title + " " + fc.name);
+        this.setTitle(org.openide.util.NbBundle.getMessage(DialogGenerateCode.class, "cycles." + fc.name + ".title"));
 
         for (int i = 0; i < fc.arg.size(); i++) {
 
@@ -137,23 +137,25 @@ public class DialogGenerateCode extends javax.swing.JDialog implements ActionLis
             c.insets = new Insets(0, 5, 0, 5);  // padding
             listPane.add(jFormattedFields.get(i), c);
 
-            String desc = fc.arg.get(i).desc;
+            String desc = org.openide.util.NbBundle.getMessage(DialogGenerateCode.class, "cycles." + fc.name + ".arg." + fc.arg.get(i).name);
+            String title = desc;
+            //String desc = fc.arg.get(i).desc;
             if (desc.length() > 35) {
-                desc = desc.substring(0, 35);
+                title = desc.substring(0, 35);
             }
-            int breakpos = desc.indexOf('\n');
+            int breakpos = title.indexOf('\n');
             if (breakpos > 0) {
-                desc = desc.substring(0, breakpos);
+                title = title.substring(0, breakpos);
             }
 
-            if (fc.arg.get(i).desc.length() > desc.length()) {
-                desc += "...";
+            if (title.length() < desc.length()) {
+                title += "...";
             }
             c = new GridBagConstraints();
             c.fill = GridBagConstraints.HORIZONTAL;
             c.gridx = 2;
             c.gridy = i;
-            listPane.add(new JLabel(desc), c);
+            listPane.add(new JLabel(title), c);
         }
 
         pack();
@@ -166,66 +168,7 @@ public class DialogGenerateCode extends javax.swing.JDialog implements ActionLis
     @Override
     public void actionPerformed(ActionEvent e) {
         if ("ok".equals(e.getActionCommand())) {
-            java.util.ArrayList<String> args = new java.util.ArrayList<>();
-            String txtGcode = "";
-
-            for (int i = 0; i < fc.arg.size(); i++) {
-                args.add(i, jFormattedFields.get(i).getText().trim());
-
-            }
-
-            PolyCirculinearCurve2D origCurve;
-            PolyCirculinearCurve2D newCurve;
-
-            try {
-                gcodereader gr = new gcodereader();
-
-                InputStream is = new ByteArrayInputStream(this.g_code.getBytes());
-                LinkedList<contourelement> origPath = gr.read(is);
-                origCurve = this.cleanup_contour(origPath);
-
-                if (fc.name.compareTo("roughing") == 0) {
-                    Roughing r = new Roughing(origCurve, fc, args);
-                    txtGcode = r.calculate();
-
-                }else if(fc.name.compareTo("mirror") == 0) {
-                    Mirror m = new Mirror(origCurve, fc, args);
-                    txtGcode = m.calculate();
-
-                }else if(fc.name.compareTo("reverse") == 0) {
-                    Reverse m = new Reverse(origCurve, fc, args);
-                    txtGcode = m.calculate();
-                }else if(fc.name.compareTo("parallel") == 0) {
-                    Parallel m = new Parallel(origCurve, fc, args);
-                    txtGcode = m.calculate();
-                
-                }else if(fc.name.compareTo("translate") == 0) {
-                    Translate m = new Translate(origCurve, fc, args);
-                    txtGcode = m.calculate();
-                }else{
-                    JOptionPane.showMessageDialog(null, "Error: no valid generator" );
-                    return;
-                }
-
-                JTextArea panelGCode = (JTextArea) (((JViewport) (((JScrollPane) this.tabOutput.getComponentAt(1)).getViewport()))).getView();
-                panelGCode.setText(txtGcode);
-
-                InputStream is_new = new ByteArrayInputStream(txtGcode.getBytes());
-                LinkedList<contourelement> newPath = gr.read(is_new);
-
-                newCurve = this.cleanup_contour(newPath);
-
-                ContourPlot panelContour = (ContourPlot) this.tabOutput.getComponentAt(0);
-                panelContour.origCurve = origCurve;
-                panelContour.newCurve = newCurve;
-                panelContour.repaint();
-
-            } catch (Exception e1) {
-                System.out.println("Error " + e1.toString());
-                JOptionPane.showMessageDialog(null, "Error: " + e1.toString());
-                return;
-
-            }
+            drawContour();
 
         } else if ("cancel".equals(e.getActionCommand())) {
             this.setVisible(false);
@@ -237,12 +180,12 @@ public class DialogGenerateCode extends javax.swing.JDialog implements ActionLis
 
     @Override
     public void focusGained(FocusEvent e) {
-        System.out.println("focusGained");
+        //System.out.println("focusGained");
         JTextField source = (JTextField) e.getSource();
         for (int i = 0; i < fc.arg.size(); i++) {
             if (source == jFormattedFields.get(i)) {
-                System.out.println("found: " + i);
-                descriptionArea.setText(fc.arg.get(i).desc);
+                //System.out.println("found: " + i);
+                descriptionArea.setText(org.openide.util.NbBundle.getMessage(DialogGenerateCode.class, "cycles." + fc.name + ".arg." + fc.arg.get(i).name));
                 return;
             }
 
@@ -272,6 +215,11 @@ public class DialogGenerateCode extends javax.swing.JDialog implements ActionLis
         tabOutput = new javax.swing.JTabbedPane();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
+        addWindowListener(new java.awt.event.WindowAdapter() {
+            public void windowOpened(java.awt.event.WindowEvent evt) {
+                formWindowOpened(evt);
+            }
+        });
 
         org.openide.awt.Mnemonics.setLocalizedText(jButtonOk, org.openide.util.NbBundle.getMessage(DialogGenerateCode.class, "DialogGenerateCode.jButtonOk.text")); // NOI18N
 
@@ -321,6 +269,11 @@ public class DialogGenerateCode extends javax.swing.JDialog implements ActionLis
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
+
+    private void formWindowOpened(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowOpened
+        // TODO add your handling code here:
+        drawContour();
+    }//GEN-LAST:event_formWindowOpened
 
     /**
      * @param args the command line arguments
@@ -388,6 +341,71 @@ public class DialogGenerateCode extends javax.swing.JDialog implements ActionLis
             }
         }
         return elements;
+
+    }
+
+    public void drawContour() {
+
+        java.util.ArrayList<String> args = new java.util.ArrayList<>();
+        String txtGcode = "";
+
+        for (int i = 0; i < fc.arg.size(); i++) {
+            args.add(i, jFormattedFields.get(i).getText().trim());
+
+        }
+
+        PolyCirculinearCurve2D origCurve;
+        PolyCirculinearCurve2D newCurve;
+
+        try {
+            gcodereader gr = new gcodereader();
+
+            InputStream is = new ByteArrayInputStream(this.g_code.getBytes());
+            LinkedList<contourelement> origPath = gr.read(is);
+            origCurve = this.cleanup_contour(origPath);
+
+            if (fc.name.compareTo("roughing") == 0) {
+                Roughing r = new Roughing(origCurve, fc, args);
+                txtGcode = r.calculate();
+
+            } else if (fc.name.compareTo("mirror") == 0) {
+                Mirror m = new Mirror(origCurve, fc, args);
+                txtGcode = m.calculate();
+
+            } else if (fc.name.compareTo("reverse") == 0) {
+                Reverse m = new Reverse(origCurve, fc, args);
+                txtGcode = m.calculate();
+            } else if (fc.name.compareTo("parallel") == 0) {
+                Parallel m = new Parallel(origCurve, fc, args);
+                txtGcode = m.calculate();
+
+            } else if (fc.name.compareTo("translate") == 0) {
+                Translate m = new Translate(origCurve, fc, args);
+                txtGcode = m.calculate();
+            } else {
+                JOptionPane.showMessageDialog(null, "Error: no valid generator");
+                return;
+            }
+
+            JTextArea panelGCode = (JTextArea) (((JViewport) (((JScrollPane) this.tabOutput.getComponentAt(1)).getViewport()))).getView();
+            panelGCode.setText(txtGcode);
+
+            InputStream is_new = new ByteArrayInputStream(txtGcode.getBytes());
+            LinkedList<contourelement> newPath = gr.read(is_new);
+
+            newCurve = this.cleanup_contour(newPath);
+
+            ContourPlot panelContour = (ContourPlot) this.tabOutput.getComponentAt(0);
+            panelContour.origCurve = origCurve;
+            panelContour.newCurve = newCurve;
+            panelContour.repaint();
+
+        } catch (Exception e1) {
+            System.out.println("Error " + e1.toString());
+            JOptionPane.showMessageDialog(null, "Error: " + e1.toString());
+            return;
+
+        }
 
     }
 

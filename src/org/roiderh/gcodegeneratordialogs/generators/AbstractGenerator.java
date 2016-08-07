@@ -102,7 +102,7 @@ public class AbstractGenerator {
         double curX;
         double curY;
 
-        output_gcode += makeComment(fc.title.trim()) + "\n";
+        output_gcode += makeComment(fc.name.trim()) + "\n";
         for (int i = 0; i < fc.arg.size(); i++) {
             output_gcode += this.makeComment(fc.arg.get(i).name + "=" + values.get(i).trim()) + "\n";
         }

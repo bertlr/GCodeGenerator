@@ -1,43 +1,35 @@
 [
     {
-        "title": "Schruppen",
         "name": "roughing",
-        "desc": "Erzeugt G-Code zum Schruppen",
         "arg": [
             {
                 "type": "real",
                 "name": "toolnoseradius",
-                "desc": "Schneidenradius",
                 "defaultval": "0.4"
             },
             {
                 "type": "real",
                 "name": "depth",
-                "desc": "Zustellung im Radius",
                 "defaultval": "0.5"
             },
             {
                 "type": "real",
                 "name": "mat_allowance_x",
-                "desc": "material allowance in X",
                 "defaultval": "0.2"
             },
             {
                 "type": "real",
                 "name": "mat_allowance_z",
-                "desc": "material allowance in Z",
                 "defaultval": "0.1"
             },
             {
                 "type": "real",
                 "name": "plunging_angle",
-                "desc": "Eintauchwinkel: 1° bis 90°",
                 "defaultval": "45"
             },
             {
                 "type": "int",
                 "name": "control",
-                "desc": "Steuerung: 0=840D, 1=810, für Commentare im Code",
                 "defaultval": "0"
             }
 
@@ -45,20 +37,16 @@
 
     },
     {
-        "title": "Spiegeln",
         "name": "mirror",
-        "desc": "Spiegeln der Kontur",
         "arg": [
             {
                 "type": "int",
                 "name": "vertical",
-                "desc": "spiegeln: vertical: 1, horizontal: 0",
                 "defaultval": "0"
             },
             {
                 "type": "int",
                 "name": "control",
-                "desc": "Steuerung: 0=840D, 1=810, für Commentare im Code",
                 "defaultval": "0"
             }
 
@@ -66,14 +54,11 @@
 
     },
     {
-        "title": "Umkehren",
         "name": "reverse",
-        "desc": "Kontur in umgekehrter Richtung abfahren",
         "arg": [
             {
                 "type": "int",
                 "name": "control",
-                "desc": "Steuerung: 0=840D, 1=810, für Commentare im Code",
                 "defaultval": "0"
             }
 
@@ -81,20 +66,16 @@
 
     },
     {
-        "title": "Parallel",
         "name": "parallel",
-        "desc": "Parallele Kontur",
         "arg": [
             {
                 "type": "real",
                 "name": "distance",
-                "desc": "Abstand der Kontur",
                 "defaultval": "0"
             },
             {
                 "type": "int",
                 "name": "control",
-                "desc": "Steuerung: 0=840D, 1=810, für Commentare im Code",
                 "defaultval": "0"
             }
 
@@ -102,26 +83,21 @@
 
     },
     {
-        "title": "Verschieben",
         "name": "translate",
-        "desc": "verschieben der Kontur",
         "arg": [
             {
                 "type": "real",
                 "name": "x",
-                "desc": "im Radius verschieben",
-                "defaultval": "0"
-            },            {
-                "type": "real",
-                "name": "z",
-                "desc": "in der Länge verschieben",
                 "defaultval": "0"
             },
-
+            {
+                "type": "real",
+                "name": "z",
+                "defaultval": "0"
+            },
             {
                 "type": "int",
                 "name": "control",
-                "desc": "Steuerung: 0=840D, 1=810, für Commentare im Code",
                 "defaultval": "0"
             }
 
