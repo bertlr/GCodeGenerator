@@ -56,10 +56,10 @@ public class GcodeGenerator {
             depth *= -1.0;
             oversize = oversize.scale(1.0, -1.0);
         }
-        
+
         // create a copy
         PolyCirculinearCurve2D elements = new PolyCirculinearCurve2D(_elements.curves());
-        
+
         //elements;
 //        for(CirculinearElement2D e : _elements){
 //            elements.add(e);
@@ -69,7 +69,7 @@ public class GcodeGenerator {
 
         gcode += makeComment("Schneidenradius: " + String.valueOf(toolNoseRadius)) + "\n";
         gcode += makeComment("Aufmass x=" + String.valueOf(oversize.getY()) + " , z=" + String.valueOf(oversize.getX())) + "\n";
-        gcode += makeComment("Eintauchwinkel " +String.format(Locale.US, "%.2f", plunging_angle * 180.0 / Math.PI)) + "\n";
+        gcode += makeComment("Eintauchwinkel " + String.format(Locale.US, "%.2f", plunging_angle * 180.0 / Math.PI)) + "\n";
 
         //gcode = "G0 X" + 2 * (startp.getY()) + " Z" + ((startp.getX()) + 0.3) + "; Startpunkt\n";
         gcode += this.rough_part(elements, depth, toolNoseRadius, oversize, max_x, max_y - depth, plunging_angle);
@@ -103,8 +103,9 @@ public class GcodeGenerator {
         Point2D new_startpoint = null;
 
         PolyOrientedCurve2D contour = new PolyOrientedCurve2D(elements);
-       
+
         double min_x = elements.lastPoint().getX();
+        Point2D prev_p2 = null;
 
         for (int i = 0; i < 100; i++) {
             Point2D p1 = null;
@@ -129,9 +130,46 @@ public class GcodeGenerator {
                 min_x = points.get(2).getX() + 0.1;
             }
 
-            p2 = points.get(0).translate(-oversize.getX() - tnrc, oversize.getY());
-            p3 = points.get(1).translate(oversize.getX(), oversize.getY());
+            p2 = points.get(0);
+            p3 = points.get(1);
             p1 = p2.translate(Math.abs(1.1 * depth) / Math.tan(plunging_angle), (1.1 * depth));
+            //p4 = p3.translate(Math.abs(0.7 * depth) / Math.tan(plunging_angle), (0.7 * depth));
+
+            // Startpunkte für eine Schicht nach hinten verschieben, damit nicht mit G0 ins Mat. gefahren wird:
+            if (prev_p2 != null && p2.getX() < elements.firstPoint().getX()) {
+                double a = prev_p2.getX() - p1.getX();
+                if (a < 0) {
+                    p2 = p2.translate(a, 0);
+                    p1 = p1.translate(a, 0);
+                }
+            }
+
+            // auf kollision testen, nur bei Hinterschnitt           
+            if (p2.getX() < elements.firstPoint().getX()) {
+                for (int j = 0; j < 100; j++) {
+                    Line2D eintauchweg = new Line2D(p1.translate(+oversize.getX()+tnrc, 0), p2.translate(+oversize.getX()+tnrc, 0));
+                    //eintauchweg = eintauchweg
+                    java.util.Collection<Point2D> inters = elements.intersections(eintauchweg);
+                    if (inters.size() <= 0) {
+                        break;
+                    }
+                    p2 = p2.translate(-oversize.getX() - 0.05, 0);
+                    p1 = p1.translate(-oversize.getX() - 0.05, 0);
+
+                }
+            }
+            // Punkt liegt bereits weit genug hinten:
+//            if(p2.getX() < points.get(0).getX() -oversize.getX() - tnrc){
+//                p2 = p2.translate(0, oversize.getY());
+//            }else{
+//                p2 = p2.translate(-oversize.getX() - tnrc, oversize.getY());
+//            }
+            
+            p1 = p1.translate(0, oversize.getY());
+            p2 = p2.translate(0, oversize.getY());
+            
+            p3 = p3.translate(oversize.getX(), oversize.getY());
+            //p1 = p2.translate(Math.abs(1.1 * depth) / Math.tan(plunging_angle), (1.1 * depth));
             p4 = p3.translate(Math.abs(0.7 * depth) / Math.tan(plunging_angle), (0.7 * depth));
 
             if (p2.getX() - p3.getX() < 0) {
@@ -143,6 +181,7 @@ public class GcodeGenerator {
             gcode += "G1 " + this.format("X", p2.getY()) + " " + this.format("Z", p2.getX()) + "\n"; // move to the depth of the cut
             gcode += "G1 " + this.format("Z", p3.getX()) + "\n";                                    // cut the layer
             gcode += "G1 " + this.format("X", p4.getY()) + " " + this.format("Z", p4.getX()) + "\n"; // drive away from contour
+            prev_p2 = p2;
 
         }
 
