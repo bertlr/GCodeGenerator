@@ -18,6 +18,7 @@ package org.roiderh.gcodegeneratordialogs.generators;
 
 import java.util.ArrayList;
 import math.geom2d.AffineTransform2D;
+import math.geom2d.circulinear.CirculinearElement2D;
 import math.geom2d.circulinear.PolyCirculinearCurve2D;
 import math.geom2d.domain.PolyOrientedCurve2D;
 import org.roiderh.gcodegeneratordialogs.FunctionConf;
@@ -33,7 +34,7 @@ public class Translate extends AbstractGenerator {
      * @param _fc
      * @param _values 
      */
-    public Translate(PolyCirculinearCurve2D _orig_contour, FunctionConf _fc, ArrayList<String> _values) {
+    public Translate(PolyCirculinearCurve2D<CirculinearElement2D> _orig_contour, FunctionConf _fc, ArrayList<String> _values) {
         super(_orig_contour, _fc, _values);
 
     }
@@ -62,7 +63,7 @@ public class Translate extends AbstractGenerator {
         AffineTransform2D tra = AffineTransform2D.createTranslation(x, y);
 
         PolyOrientedCurve2D new_curve = this.orig_contour.transform(tra);
-        PolyCirculinearCurve2D new_curve_1 = new PolyCirculinearCurve2D(new_curve.curves());
+        PolyCirculinearCurve2D<CirculinearElement2D> new_curve_1 = new PolyCirculinearCurve2D<>(new_curve.curves());
         output_gcode = this.convert2gcode(new_curve_1);
 
         return output_gcode;

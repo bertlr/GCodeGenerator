@@ -19,6 +19,7 @@ package org.roiderh.gcodegeneratordialogs;
 import java.util.ArrayList;
 import java.util.Locale;
 import math.geom2d.Point2D;
+import math.geom2d.circulinear.CirculinearElement2D;
 import math.geom2d.circulinear.PolyCirculinearCurve2D;
 import math.geom2d.domain.PolyOrientedCurve2D;
 import math.geom2d.line.Line2D;
@@ -45,7 +46,7 @@ public class GcodeGenerator {
      * @param plunging_angle in rad! 1 to 90 degree
      * @return G-code
      */
-    public String rough(PolyCirculinearCurve2D _elements, double depth, double toolNoseRadius, Point2D oversize, double plunging_angle) throws Exception {
+    public String rough(PolyCirculinearCurve2D<CirculinearElement2D> _elements, double depth, double toolNoseRadius, Point2D oversize, double plunging_angle) throws Exception {
         double max_x = _elements.firstPoint().getX(); // z-achse
         double max_y = _elements.lastPoint().getY(); // x-achse
 
@@ -58,7 +59,7 @@ public class GcodeGenerator {
         }
 
         // create a copy
-        PolyCirculinearCurve2D elements = new PolyCirculinearCurve2D(_elements.curves());
+        PolyCirculinearCurve2D<CirculinearElement2D> elements = new PolyCirculinearCurve2D<>(_elements.curves());
 
         //elements;
 //        for(CirculinearElement2D e : _elements){
@@ -95,7 +96,7 @@ public class GcodeGenerator {
      * @return G-code
      * @throws Exception
      */
-    private String rough_part(PolyCirculinearCurve2D elements, double depth, double toolNoseRadius, Point2D oversize, double max_x, double y_layer, double plunging_angle) throws Exception {
+    private String rough_part(PolyCirculinearCurve2D<CirculinearElement2D> elements, double depth, double toolNoseRadius, Point2D oversize, double max_x, double y_layer, double plunging_angle) throws Exception {
         String gcode = "";
 
         double tnrc = toolNoseRadius * (1 + Math.tan(0.5 * plunging_angle)); // only for undercut elements to avoid a crash with the contour because of the tool nose radius

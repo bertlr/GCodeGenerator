@@ -23,6 +23,7 @@ import javax.swing.JPanel;
 import math.geom2d.AffineTransform2D;
 import math.geom2d.Box2D;
 import math.geom2d.Point2D;
+import math.geom2d.circulinear.CirculinearElement2D;
 import math.geom2d.circulinear.PolyCirculinearCurve2D;
 import math.geom2d.conic.Circle2D;
 import math.geom2d.line.Line2D;
@@ -36,8 +37,8 @@ public class ContourPlot extends JPanel {
     /**
      * The curves to display
      */
-    public PolyCirculinearCurve2D origCurve;
-    public PolyCirculinearCurve2D newCurve;
+    public PolyCirculinearCurve2D<CirculinearElement2D> origCurve;
+    public PolyCirculinearCurve2D<CirculinearElement2D> newCurve;
 
     private void doDrawing(Graphics g) {
         if (this.origCurve == null) {
@@ -49,11 +50,14 @@ public class ContourPlot extends JPanel {
 
         Graphics2D g2d = (Graphics2D) g;
 
-        PolyCirculinearCurve2D orig_curve = origCurve;
+        PolyCirculinearCurve2D<CirculinearElement2D> orig_curve = origCurve;
 
         // only to determine the bounding box of all 2 curves:
-        PolyCirculinearCurve2D closed_c = new PolyCirculinearCurve2D(origCurve.curves());
-        closed_c.add(newCurve);
+        PolyCirculinearCurve2D<CirculinearElement2D> closed_c = new PolyCirculinearCurve2D<>(origCurve.curves());
+        //closed_c.add(newCurve.continuousCurves());
+        for(CirculinearElement2D el : newCurve){
+           closed_c.add(el);
+        }
         // close curve for the boundingBox, otherwise last elements are not included, don't know why:
         closed_c.add(new Line2D(closed_c.lastPoint(), closed_c.firstPoint()));
 
@@ -85,7 +89,7 @@ public class ContourPlot extends JPanel {
         if (newCurve == null) {
             return;
         }
-        PolyCirculinearCurve2D new_curve = newCurve;
+        PolyCirculinearCurve2D<CirculinearElement2D> new_curve = newCurve;
         g2d.setColor(Color.RED);
         new_curve.transform(mir).transform(sca).transform(tra).draw(g2d);
         // draw a circle at the end of the curve

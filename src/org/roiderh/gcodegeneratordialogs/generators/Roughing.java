@@ -18,6 +18,7 @@ package org.roiderh.gcodegeneratordialogs.generators;
 
 import java.util.ArrayList;
 import math.geom2d.Point2D;
+import math.geom2d.circulinear.CirculinearElement2D;
 import math.geom2d.circulinear.PolyCirculinearCurve2D;
 import org.roiderh.gcodegeneratordialogs.FunctionConf;
 import org.roiderh.gcodegeneratordialogs.GcodeGenerator;
@@ -28,7 +29,7 @@ import org.roiderh.gcodegeneratordialogs.GcodeGenerator;
  */
 public class Roughing extends AbstractGenerator {
 
-    public Roughing(PolyCirculinearCurve2D _orig_contour, FunctionConf _fc, ArrayList<String> _values) {
+    public Roughing(PolyCirculinearCurve2D<CirculinearElement2D> _orig_contour, FunctionConf _fc, ArrayList<String> _values) {
         super(_orig_contour, _fc, _values);
      
     }

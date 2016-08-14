@@ -6,11 +6,8 @@
 package org.roiderh.gcodegeneratordialogs.generators;
 
 import java.util.ArrayList;
-import math.geom2d.AffineTransform2D;
-import math.geom2d.Point2D;
+import math.geom2d.circulinear.CirculinearElement2D;
 import math.geom2d.circulinear.PolyCirculinearCurve2D;
-import math.geom2d.domain.PolyOrientedCurve2D;
-import math.geom2d.line.Line2D;
 import org.roiderh.gcodegeneratordialogs.FunctionConf;
 
 /**
@@ -19,7 +16,7 @@ import org.roiderh.gcodegeneratordialogs.FunctionConf;
  */
 public class Reverse extends AbstractGenerator {
 
-    public Reverse(PolyCirculinearCurve2D _orig_contour, FunctionConf _fc, ArrayList<String> _values) {
+    public Reverse(PolyCirculinearCurve2D<CirculinearElement2D> _orig_contour, FunctionConf _fc, ArrayList<String> _values) {
         super(_orig_contour, _fc, _values);
 
     }

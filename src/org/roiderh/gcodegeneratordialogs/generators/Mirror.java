@@ -19,6 +19,7 @@ package org.roiderh.gcodegeneratordialogs.generators;
 import java.util.ArrayList;
 import math.geom2d.AffineTransform2D;
 import math.geom2d.Point2D;
+import math.geom2d.circulinear.CirculinearElement2D;
 import math.geom2d.circulinear.PolyCirculinearCurve2D;
 import math.geom2d.domain.PolyOrientedCurve2D;
 import math.geom2d.line.Line2D;
@@ -32,7 +33,7 @@ public class Mirror extends AbstractGenerator {
 
    
 
-    public Mirror(PolyCirculinearCurve2D _orig_contour, FunctionConf _fc, ArrayList<String> _values) {
+    public Mirror(PolyCirculinearCurve2D<CirculinearElement2D> _orig_contour, FunctionConf _fc, ArrayList<String> _values) {
         super(_orig_contour, _fc, _values);
 
     }
@@ -61,7 +62,7 @@ public class Mirror extends AbstractGenerator {
         }
 
         PolyOrientedCurve2D new_curve = this.orig_contour.transform(mir_center);
-        PolyCirculinearCurve2D new_curve_1 = new PolyCirculinearCurve2D(new_curve.curves());
+        PolyCirculinearCurve2D<CirculinearElement2D> new_curve_1 = new PolyCirculinearCurve2D<>((java.util.Collection<CirculinearElement2D>) new_curve.curves());
         output_gcode = this.convert2gcode(new_curve_1);
        
         return output_gcode;

@@ -27,6 +27,7 @@ import java.awt.event.*;
 import java.util.LinkedList;
 import javax.swing.text.html.HTMLEditorKit;
 import javax.swing.text.html.StyleSheet;
+import math.geom2d.circulinear.CirculinearElement2D;
 import math.geom2d.circulinear.PolyCirculinearCurve2D;
 import org.roiderh.gcodegeneratordialogs.generators.Mirror;
 import org.roiderh.gcodegeneratordialogs.generators.Parallel;
@@ -324,8 +325,8 @@ public class DialogGenerateCode extends javax.swing.JDialog implements ActionLis
      * @param contour
      * @return
      */
-    private PolyCirculinearCurve2D cleanup_contour(LinkedList<contourelement> contour) {
-        PolyCirculinearCurve2D elements = new PolyCirculinearCurve2D();
+    private PolyCirculinearCurve2D<CirculinearElement2D> cleanup_contour(LinkedList<contourelement> contour) {
+        PolyCirculinearCurve2D<CirculinearElement2D> elements = new PolyCirculinearCurve2D<>();
         for (contourelement current_ce : contour) {
 
             if (current_ce.curve == null) {
@@ -354,8 +355,8 @@ public class DialogGenerateCode extends javax.swing.JDialog implements ActionLis
 
         }
 
-        PolyCirculinearCurve2D origCurve;
-        PolyCirculinearCurve2D newCurve;
+        PolyCirculinearCurve2D<CirculinearElement2D> origCurve;
+        PolyCirculinearCurve2D<CirculinearElement2D> newCurve;
 
         try {
             gcodereader gr = new gcodereader();
@@ -387,7 +388,7 @@ public class DialogGenerateCode extends javax.swing.JDialog implements ActionLis
                 return;
             }
 
-            JTextArea panelGCode = (JTextArea) (((JViewport) (((JScrollPane) this.tabOutput.getComponentAt(1)).getViewport()))).getView();
+            JTextArea panelGCode = (JTextArea) (( (((JScrollPane) this.tabOutput.getComponentAt(1)).getViewport()))).getView();
             panelGCode.setText(txtGcode);
 
             InputStream is_new = new ByteArrayInputStream(txtGcode.getBytes());

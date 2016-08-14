@@ -35,7 +35,7 @@ public class AbstractGenerator {
     protected String g_code;
     protected FunctionConf fc;
     protected ArrayList<String> values;
-    protected PolyCirculinearCurve2D orig_contour;
+    protected PolyCirculinearCurve2D<CirculinearElement2D> orig_contour;
     protected int control = 0; // 0 = 840D, 1 = 810
 
     /**
@@ -44,7 +44,7 @@ public class AbstractGenerator {
      * @param _fc Parameter description
      * @param _values Parameters
      */
-    public AbstractGenerator(PolyCirculinearCurve2D _orig_contour, FunctionConf _fc, ArrayList<String> _values) {
+    public AbstractGenerator(PolyCirculinearCurve2D<CirculinearElement2D> _orig_contour, FunctionConf _fc, ArrayList<String> _values) {
         orig_contour = _orig_contour;
         fc = _fc;
         values = _values;
@@ -68,8 +68,8 @@ public class AbstractGenerator {
      * @param contour
      * @return
      */
-    protected final PolyCirculinearCurve2D cleanup_contour(LinkedList<contourelement> contour) {
-        PolyCirculinearCurve2D clean_contour = new PolyCirculinearCurve2D();
+    protected final PolyCirculinearCurve2D<CirculinearElement2D> cleanup_contour(LinkedList<contourelement> contour) {
+        PolyCirculinearCurve2D<CirculinearElement2D> clean_contour = new PolyCirculinearCurve2D<>();
         for (contourelement current_ce : contour) {
 
             if (current_ce.curve == null) {
@@ -94,7 +94,7 @@ public class AbstractGenerator {
      * @param new_curve
      * @return g-code
      */
-    public String convert2gcode(PolyCirculinearCurve2D new_curve) {
+    public String convert2gcode(PolyCirculinearCurve2D<CirculinearElement2D> new_curve) {
 
         String output_gcode = "";
         double prevX = 0.0;
@@ -110,7 +110,7 @@ public class AbstractGenerator {
         output_gcode += this.makeComment("Begin of generated contour") + "\n";
         ArrayList<CirculinearElement2D> el = (ArrayList<CirculinearElement2D>) new_curve.curves();
         for (int i = 0; i < el.size(); i++) {
-            CirculinearElement2D curve = (CirculinearElement2D) el.get(i);
+            CirculinearElement2D curve = el.get(i);
             if (i == 0) {
                 curX = curve.firstPoint().getX();
                 curY = curve.firstPoint().getY();
@@ -161,16 +161,16 @@ public class AbstractGenerator {
     private String format(String axis, double d) {
         if (axis == "x" || axis == "X") {
             d *= 2.0;
-            return String.format(Locale.US, " X%.2f", d);
+            return String.format(Locale.US, " X%.3f", d);
         } else if (axis == "R") { // Radius
             if (control == 1) { // 810
-                return String.format(Locale.US, " B%.2f", d);
+                return String.format(Locale.US, " B%.3f", d);
             } else {  // 840D
-                return String.format(Locale.US, " CR=%.2f", d);
+                return String.format(Locale.US, " CR=%.3f", d);
             }
 
         } else {
-            return String.format(Locale.US, " Z%.2f", d);
+            return String.format(Locale.US, " Z%.3f", d);
         }
 
     }

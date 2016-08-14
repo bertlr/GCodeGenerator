@@ -27,7 +27,7 @@ import org.roiderh.gcodeviewer.geometry;
  */
 public class Parallel extends AbstractGenerator {
 
-    public Parallel(PolyCirculinearCurve2D _orig_contour, FunctionConf _fc, ArrayList<String> _values) {
+    public Parallel(PolyCirculinearCurve2D<CirculinearElement2D> _orig_contour, FunctionConf _fc, ArrayList<String> _values) {
         super(_orig_contour, _fc, _values);
 
     }
@@ -50,13 +50,13 @@ public class Parallel extends AbstractGenerator {
         String output_gcode = "";
       
 
-        PolyOrientedCurve2D new_curve = this.parallel(orig_contour, dist);
-        PolyCirculinearCurve2D new_curve_1 = new PolyCirculinearCurve2D(new_curve.curves());
+        PolyOrientedCurve2D<CirculinearElement2D> new_curve = this.parallel(orig_contour, dist);
+        PolyCirculinearCurve2D<CirculinearElement2D> new_curve_1 = new PolyCirculinearCurve2D<>(new_curve.curves());
         output_gcode = this.convert2gcode(new_curve_1);
 
         return output_gcode;
     }
-    PolyCirculinearCurve2D parallel(PolyCirculinearCurve2D set, double offset) {
+    PolyCirculinearCurve2D<CirculinearElement2D> parallel(PolyCirculinearCurve2D<CirculinearElement2D> set, double offset) {
         geometry geo = new geometry();
         RoundJoinFactory jf = new RoundJoinFactory();
         RoundCapFactory bcf = new RoundCapFactory();
@@ -79,13 +79,13 @@ public class Parallel extends AbstractGenerator {
 
         ArrayList<CirculinearElement2D> el = (ArrayList<CirculinearElement2D>) cc.continuousCurves();
 
-        PolyCirculinearCurve2D el_2 = (PolyCirculinearCurve2D) el.get(0);
+        PolyCirculinearCurve2D<CirculinearElement2D> el_2 = (PolyCirculinearCurve2D<CirculinearElement2D>) el.get(0);
 
         ArrayList<CirculinearElement2D> el_3 = new ArrayList<>();
-        PolyCirculinearCurve2D el_4 = new PolyCirculinearCurve2D();
+        PolyCirculinearCurve2D<CirculinearElement2D> el_4 = new PolyCirculinearCurve2D<>();
 
         for (int i = 0; i < el_2.size(); i++) {
-            CirculinearElement2D elem = (CirculinearElement2D) el_2.get(i);
+            CirculinearElement2D elem = el_2.get(i);
             el_3.add(elem);
 
         }
@@ -95,7 +95,7 @@ public class Parallel extends AbstractGenerator {
         //ArrayList<Point2D> points_arr_clean = points_arr;
         ArrayList<Point2D> points_arr_used = new ArrayList<>();
         for (int i = 0; i < el_3.size(); i++) {
-            CirculinearElement2D elem = (CirculinearElement2D) el_3.get(i);
+            CirculinearElement2D elem = el_3.get(i);
             boolean contains_begin = false;
             boolean contains_end = false;
             if (begin != null && elem.contains(begin)) {
