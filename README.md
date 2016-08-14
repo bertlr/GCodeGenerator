@@ -1,11 +1,12 @@
 # GCodeGenerator
 
-Allows to create G-code for roughing for Sinumerik 810 and 840D. Only for lathe.
+Allows to create G-code.
+Contour manipulations like: parallel contour, translate, mirror, reverse direction. 
+Generate g-code for roughing from a contour It is only for lathe, the x-axis is the diameter and the z-axis is the length. 
 
 # Installation
 
-* at the moment not to download from netbeans repository, you can download it from github, open in netbeans and right mouse button on the Project and "Create NBM" to compile it.
-The compiled file ".nbm" is in Project folder in the "build" directory.
+* Download from: http://plugins.netbeans.org/plugin/68344/
 * Go to "Tools" -> "Plugins" -> "Downloaded", click "Add Plugins..." and select the downloaded file org-roiderh-gcodefunctions.nbm
 * Check the Checkbox and click "Install"
 
