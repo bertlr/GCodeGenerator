@@ -23,10 +23,10 @@ import javax.swing.text.JTextComponent;
 import org.openide.awt.ActionID;
 import org.openide.awt.ActionReference;
 import org.openide.awt.ActionRegistration;
-import org.openide.util.NbBundle.Messages;
 import com.google.gson.Gson;
 import java.io.InputStreamReader;
 import java.io.Reader;
+import org.openide.awt.ActionReferences;
 import org.roiderh.gcodegeneratordialogs.FunctionConf;
 import org.roiderh.gcodegeneratordialogs.DialogSelectGenerator;
 import org.roiderh.gcodegeneratordialogs.DialogGenerateCode;
@@ -39,8 +39,12 @@ import org.roiderh.gcodegeneratordialogs.DialogGenerateCode;
         iconBase = "org/roiderh/gcodegenerator/hi22-gcode-generator.png",
         displayName = "#CTL_GCodeGeneratorActionListener"
 )
-@ActionReference(path = "Toolbars/File", position = 0)
-@Messages("CTL_GCodeGeneratorActionListener=generates g-code")
+@ActionReferences({
+    @ActionReference(path = "Toolbars/File", position = 0),
+    @ActionReference(path = "Editors/text/plain/Popup"),
+    @ActionReference(path = "Editors/text/x-nc/Popup")
+})
+
 public final class GCodeGeneratorActionListener implements ActionListener {
 
     //private LineCookie context;
@@ -75,15 +79,14 @@ public final class GCodeGeneratorActionListener implements ActionListener {
             nf.setLocationRelativeTo(org.openide.windows.WindowManager.getDefault().getMainWindow());
             nf.setVisible(true);
             generator_conf = nf.generator;
-            if(generator_conf == null){
+            if (generator_conf == null) {
                 return;
             }
 
-            
             DialogGenerateCode btf = new DialogGenerateCode(selectedText, generator_conf, org.openide.windows.WindowManager.getDefault().getMainWindow(), true);
             btf.setLocationRelativeTo(org.openide.windows.WindowManager.getDefault().getMainWindow());
             btf.setVisible(true);
-           
+
         } catch (Exception e1) {
             System.out.println("Error " + e1.toString());
             JOptionPane.showMessageDialog(null, "Error: " + e1.getMessage());
