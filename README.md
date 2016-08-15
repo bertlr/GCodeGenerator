@@ -6,7 +6,7 @@ Generate g-code for roughing from a contour It is only for lathe, the x-axis is 
 
 # Installation
 
-* Download from: http://plugins.netbeans.org/plugin/68344/
+* Download from: [http://plugins.netbeans.org/plugin/68344/](http://plugins.netbeans.org/plugin/68344/ )
 * Go to "Tools" -> "Plugins" -> "Downloaded", click "Add Plugins..." and select the downloaded file org-roiderh-gcodefunctions.nbm
 * Check the Checkbox and click "Install"
 
