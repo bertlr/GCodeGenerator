@@ -36,6 +36,7 @@ public class GcodeGenerator {
      */
     public int control = 0;
     public ArrayList< ArrayList<Point2D>> intersect_p = new ArrayList<>();
+    private PolyCirculinearCurve2D<CirculinearElement2D> orig_contour;
 
     /**
      *
@@ -47,9 +48,7 @@ public class GcodeGenerator {
      * @return G-code
      */
     public String rough(PolyCirculinearCurve2D<CirculinearElement2D> _elements, double depth, double toolNoseRadius, Point2D oversize, double plunging_angle) throws Exception {
-        double max_x = _elements.firstPoint().getX(); // z-achse
-        double max_y = _elements.lastPoint().getY(); // x-achse
-
+        orig_contour = _elements;
         String gcode = makeComment("Abspantiefe: " + String.valueOf(depth)) + "\n";
 
         // Innencontour:
@@ -66,7 +65,9 @@ public class GcodeGenerator {
 //            elements.add(e);
 //        }
         // Am Anfang eine Linie anhängen, damit die Contour vorne geschlossen ist:
-        elements.add(0, new Line2D(new Point2D(elements.firstPoint().x(), elements.lastPoint().y()), elements.firstPoint()));
+        elements.add(0, new LineSegment2D(new Point2D(elements.firstPoint().getX(), elements.lastPoint().y()), elements.firstPoint()));
+        double max_x = elements.firstPoint().getX(); // z-achse
+        double max_y = elements.lastPoint().getY(); // x-achse
 
         gcode += makeComment("Schneidenradius: " + String.valueOf(toolNoseRadius)) + "\n";
         gcode += makeComment("Aufmass x=" + String.valueOf(oversize.getY()) + " , z=" + String.valueOf(oversize.getX())) + "\n";
@@ -146,18 +147,16 @@ public class GcodeGenerator {
             }
 
             // auf kollision testen, nur bei Hinterschnitt           
-            if (p2.getX() < elements.firstPoint().getX()) {
-                for (int j = 0; j < 100; j++) {
-                    Line2D eintauchweg = new Line2D(p1.translate(+oversize.getX()+tnrc, 0), p2.translate(+oversize.getX()+tnrc, 0));
-                    //eintauchweg = eintauchweg
-                    java.util.Collection<Point2D> inters = elements.intersections(eintauchweg);
-                    if (inters.size() <= 0) {
-                        break;
-                    }
-                    p2 = p2.translate(-oversize.getX() - 0.05, 0);
-                    p1 = p1.translate(-oversize.getX() - 0.05, 0);
-
+            for (int j = 0; j < 100; j++) {
+                Line2D eintauchweg = new Line2D(p1.translate(+oversize.getX() + tnrc, 0), p2.translate(+oversize.getX() + tnrc, 0));
+                //eintauchweg = eintauchweg
+                java.util.Collection<Point2D> inters = this.orig_contour.intersections(eintauchweg);
+                if (inters.size() <= 0) {
+                    break;
                 }
+                p2 = p2.translate(-oversize.getX() - 0.05, 0);
+                p1 = p1.translate(-oversize.getX() - 0.05, 0);
+
             }
             // Punkt liegt bereits weit genug hinten:
 //            if(p2.getX() < points.get(0).getX() -oversize.getX() - tnrc){
@@ -165,10 +164,10 @@ public class GcodeGenerator {
 //            }else{
 //                p2 = p2.translate(-oversize.getX() - tnrc, oversize.getY());
 //            }
-            
+
             p1 = p1.translate(0, oversize.getY());
             p2 = p2.translate(0, oversize.getY());
-            
+
             p3 = p3.translate(oversize.getX(), oversize.getY());
             //p1 = p2.translate(Math.abs(1.1 * depth) / Math.tan(plunging_angle), (1.1 * depth));
             p4 = p3.translate(Math.abs(0.7 * depth) / Math.tan(plunging_angle), (0.7 * depth));
@@ -187,7 +186,7 @@ public class GcodeGenerator {
         }
 
         if (new_startpoint != null) {
-            gcode += makeComment("neue Senke Startpunkt") + "\n";
+            gcode += makeComment("Undercut") + "\n";
             gcode += "G0 " + this.format("X", (elements.lastPoint().getY()) + 0.1 * depth + oversize.getY()) + "\n";
             gcode += this.rough_part(elements, depth, toolNoseRadius, oversize, new_startpoint.getX(), new_startpoint.getY(), plunging_angle);
 
