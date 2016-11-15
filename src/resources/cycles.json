@@ -97,6 +97,11 @@
             },
             {
                 "type": "int",
+                "name": "repeated",
+                "defaultval": "0"
+            },
+            {
+                "type": "int",
                 "name": "control",
                 "defaultval": "0"
             }
