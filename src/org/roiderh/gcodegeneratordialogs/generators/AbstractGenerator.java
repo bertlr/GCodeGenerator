@@ -16,6 +16,8 @@
  */
 package org.roiderh.gcodegeneratordialogs.generators;
 
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.Locale;
@@ -159,20 +161,25 @@ public class AbstractGenerator {
      * to diameter.
      */
     private String format(String axis, double d) {
+        NumberFormat nf = NumberFormat.getNumberInstance(Locale.US);
+        DecimalFormat df = (DecimalFormat) nf;
+        df.applyPattern("0.###");
+        String ret = new String();
+
         if (axis == "x" || axis == "X") {
             d *= 2.0;
-            return String.format(Locale.US, " X%.3f", d);
+            ret = new String(" X" + df.format(d).toString());
         } else if (axis == "R") { // Radius
             if (control == 1) { // 810
-                return String.format(Locale.US, " B%.3f", d);
+                ret = new String(" B" + df.format(d).toString());
             } else {  // 840D
-                return String.format(Locale.US, " CR=%.3f", d);
+                ret = new String(" CR=" + df.format(d).toString());
             }
 
         } else {
-            return String.format(Locale.US, " Z%.3f", d);
+            ret = new String(" Z" + df.format(d).toString());
         }
-
+        return ret;
     }
 
     /**
