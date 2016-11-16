@@ -168,16 +168,16 @@ public class AbstractGenerator {
 
         if (axis == "x" || axis == "X") {
             d *= 2.0;
-            ret = new String(" X" + df.format(d).toString());
+            ret = new String(" X") + df.format(d);
         } else if (axis == "R") { // Radius
             if (control == 1) { // 810
-                ret = new String(" B" + df.format(d).toString());
+                ret = new String(" B") + df.format(d);
             } else {  // 840D
-                ret = new String(" CR=" + df.format(d).toString());
+                ret = new String(" CR=") + df.format(d);
             }
 
         } else {
-            ret = new String(" Z" + df.format(d).toString());
+            ret = new String(" Z") + df.format(d);
         }
         return ret;
     }
