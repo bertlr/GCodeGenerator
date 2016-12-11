@@ -17,6 +17,8 @@
 package org.roiderh.gcodegeneratordialogs;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Locale;
 import math.geom2d.Point2D;
 import math.geom2d.circulinear.CirculinearElement2D;
@@ -35,6 +37,9 @@ public class GcodeGenerator {
      * only for the format of the commments Siemens Sinumerik 840D=0, 810=1
      */
     public int control = 0;
+    /**
+     * only for debugging:
+     */
     public ArrayList< ArrayList<Point2D>> intersect_p = new ArrayList<>();
     private PolyCirculinearCurve2D<CirculinearElement2D> orig_contour;
 
@@ -60,82 +65,67 @@ public class GcodeGenerator {
         // create a copy
         PolyCirculinearCurve2D<CirculinearElement2D> elements = new PolyCirculinearCurve2D<>(_elements.curves());
 
-        //elements;
-//        for(CirculinearElement2D e : _elements){
-//            elements.add(e);
-//        }
         // Am Anfang eine Linie anhängen, damit die Contour vorne geschlossen ist:
         elements.add(0, new LineSegment2D(new Point2D(elements.firstPoint().getX(), elements.lastPoint().y()), elements.firstPoint()));
-        double max_x = elements.firstPoint().getX(); // z-achse
-        double max_y = elements.lastPoint().getY(); // x-achse
 
         gcode += makeComment("Schneidenradius: " + String.valueOf(toolNoseRadius)) + "\n";
         gcode += makeComment("Aufmass x=" + String.valueOf(oversize.getY()) + " , z=" + String.valueOf(oversize.getX())) + "\n";
         gcode += makeComment("Eintauchwinkel " + String.format(Locale.US, "%.2f", plunging_angle * 180.0 / Math.PI)) + "\n";
 
-        //gcode = "G0 X" + 2 * (startp.getY()) + " Z" + ((startp.getX()) + 0.3) + "; Startpunkt\n";
-        gcode += this.rough_part(elements, depth, toolNoseRadius, oversize, max_x, max_y - depth, plunging_angle);
-        gcode += "G0 " + this.format("X", elements.lastPoint().getY() + 0.1 * depth + oversize.getY()) + "\n";
-        gcode += "G0 " + this.format("Z", elements.firstPoint().getX()) + "\n";
+        ArrayList<LineSegment2D> lines = this.getLines(elements, depth);
 
+        gcode += this.rough_part(elements, depth, toolNoseRadius, oversize, plunging_angle, lines);
         gcode += makeComment("End of generated code") + "\n";
-        System.out.print(gcode);
         return gcode;
     }
 
     /**
      *
      * @param elements contour
-     * @param depth
+     * @param depth a negative number is for inside roughing
      * @param toolNoseRadius
      * @param oversize material allowance
-     * @param max_x at the beginning it is the x-value of the first point of the
-     * contour
-     * @param y_layer the layer for roughing, at the beginning it is the y-value
-     * of the last point minus the depth
      * @param plunging_angle
+     * @param lines the layers to roughing
      * @return G-code
      * @throws Exception
      */
-    private String rough_part(PolyCirculinearCurve2D<CirculinearElement2D> elements, double depth, double toolNoseRadius, Point2D oversize, double max_x, double y_layer, double plunging_angle) throws Exception {
+    private String rough_part(PolyCirculinearCurve2D<CirculinearElement2D> elements, double depth, double toolNoseRadius, Point2D oversize, double plunging_angle, ArrayList<LineSegment2D> lines) throws Exception {
         String gcode = "";
 
         double tnrc = toolNoseRadius * (1 + Math.tan(0.5 * plunging_angle)); // only for undercut elements to avoid a crash with the contour because of the tool nose radius
 
-        Point2D new_startpoint = null;
+        Point2D prev_p2 = null; // calculated with oversize, ..
+        Point2D prev_orig_p2 = null; // Point directly from original line (layer)
 
-        PolyOrientedCurve2D contour = new PolyOrientedCurve2D(elements);
-
-        double min_x = elements.lastPoint().getX();
-        Point2D prev_p2 = null;
-
-        for (int i = 0; i < 100; i++) {
+        for (int i = 0; i < lines.size(); i++) {
             Point2D p1 = null;
             Point2D p2 = null;
             Point2D p3 = null;
             Point2D p4 = null;
-            LineSegment2D l = new LineSegment2D(max_x + 0.01, y_layer - i * depth, min_x - 0.01, y_layer - i * depth);
 
-            ArrayList<Point2D> points = (ArrayList<Point2D>) contour.intersections(l);
-            this.intersect_p.add(points);
+            LineSegment2D l = lines.get(i);
 
-            if (points.isEmpty()) {
-                break;
+            p2 = l.firstPoint();
+            p3 = l.lastPoint();
+
+            // this would be the next undercut
+            if (prev_orig_p2 != null) {
+                // Inner
+                if (depth < 0) {
+                    if (prev_orig_p2.getY() >= p2.getY()) {
+                        gcode += makeComment("Undercut") + "\n";
+                        gcode += "G0 " + this.format("X", (elements.lastPoint().getY()) + 0.1 * depth + oversize.getY()) + "\n";
+                    }
+                } else if (prev_orig_p2.getY() <= p2.getY()) {
+                    gcode += makeComment("Undercut") + "\n";
+                    gcode += "G0 " + this.format("X", (elements.lastPoint().getY()) + 0.1 * depth + oversize.getY()) + "\n";
+
+                }
             }
-            if ((points.size() % 2) != 0) {
-                Exception newExcept = new Exception("size of intersection points is odd: " + String.valueOf(points.size()) + ", line number: " + String.valueOf(i) + ", try to change the depth");
-                throw newExcept;
-            }
+            prev_orig_p2 = p2;
 
-            if (new_startpoint == null && points.size() > 2) {
-                new_startpoint = points.get(2);
-                min_x = points.get(2).getX() + 0.1;
-            }
-
-            p2 = points.get(0);
-            p3 = points.get(1);
             p1 = p2.translate(Math.abs(1.1 * depth) / Math.tan(plunging_angle), (1.1 * depth));
-            //p4 = p3.translate(Math.abs(0.7 * depth) / Math.tan(plunging_angle), (0.7 * depth));
 
             // Startpunkte für eine Schicht nach hinten verschieben, damit nicht mit G0 ins Mat. gefahren wird:
             if (prev_p2 != null && p2.getX() < elements.firstPoint().getX()) {
@@ -145,6 +135,7 @@ public class GcodeGenerator {
                     p1 = p1.translate(a, 0);
                 }
             }
+            
 
             // auf kollision testen, nur bei Hinterschnitt           
             for (int j = 0; j < 100; j++) {
@@ -158,18 +149,10 @@ public class GcodeGenerator {
                 p1 = p1.translate(-oversize.getX() - 0.05, 0);
 
             }
-            // Punkt liegt bereits weit genug hinten:
-//            if(p2.getX() < points.get(0).getX() -oversize.getX() - tnrc){
-//                p2 = p2.translate(0, oversize.getY());
-//            }else{
-//                p2 = p2.translate(-oversize.getX() - tnrc, oversize.getY());
-//            }
 
             p1 = p1.translate(0, oversize.getY());
             p2 = p2.translate(0, oversize.getY());
-
             p3 = p3.translate(oversize.getX(), oversize.getY());
-            //p1 = p2.translate(Math.abs(1.1 * depth) / Math.tan(plunging_angle), (1.1 * depth));
             p4 = p3.translate(Math.abs(0.7 * depth) / Math.tan(plunging_angle), (0.7 * depth));
 
             if (p2.getX() - p3.getX() < 0) {
@@ -184,14 +167,132 @@ public class GcodeGenerator {
             prev_p2 = p2;
 
         }
+        gcode += "G0 " + this.format("X", elements.lastPoint().getY() + 0.1 * depth + oversize.getY()) + "\n";
+        gcode += "G0 " + this.format("Z", elements.firstPoint().getX()) + "\n";
 
-        if (new_startpoint != null) {
-            gcode += makeComment("Undercut") + "\n";
-            gcode += "G0 " + this.format("X", (elements.lastPoint().getY()) + 0.1 * depth + oversize.getY()) + "\n";
-            gcode += this.rough_part(elements, depth, toolNoseRadius, oversize, new_startpoint.getX(), new_startpoint.getY(), plunging_angle);
+        return gcode;
+    }
+
+    /**
+     *
+     * @param text
+     * @return commented text like: "( I am a comment )"
+     */
+    private String makeComment(String text) {
+        if (control == 1) {
+            return " ( " + text + " ) ";
+        } else {
+            return " ; " + text;
+        }
+    }
+
+    /**
+     * Sorter for the cutting layers
+     */
+    public class LineCompare implements Comparator<LineSegment2D> {
+
+        /**
+         * true if outside of the workpice
+         */
+        boolean outer = false;
+
+        public LineCompare(boolean _outer) {
+
+            outer = _outer;
+        }
+
+        /**
+         * Outside contour:
+         * <pre>
+         * |-----------1------------|
+         * |---4-----|    |----2----|
+         * |---5----|     |----3----|
+         * </pre>
+         *
+         * @param a
+         * @param b
+         * @return
+         */
+        @Override
+        public int compare(LineSegment2D a, LineSegment2D b) {
+            if (a.lastPoint().getX() > b.firstPoint().getX()) {
+                return -1;
+            }
+            if (b.lastPoint().getX() > a.firstPoint().getX()) {
+                return 1;
+            }
+            if (outer == false) {
+                if (a.firstPoint().getY() < b.firstPoint().getY()) {
+                    return -1;
+                } else {
+                    return 1;
+                }
+            } else if (a.firstPoint().getY() < b.firstPoint().getY()) {
+                return 1;
+            } else {
+                return -1;
+            }
 
         }
-        return gcode;
+    }
+
+    /**
+     * calculate the cutting layers and sort them
+     *
+     * @param elements
+     * @param depth a negative number is for inside roughing
+     * @return
+     * @throws Exception
+     */
+    private ArrayList<LineSegment2D> getLines(PolyCirculinearCurve2D<CirculinearElement2D> elements, double depth) throws Exception {
+
+        ArrayList<LineSegment2D> lines = new ArrayList<>();
+
+        PolyOrientedCurve2D contour = new PolyOrientedCurve2D(elements);
+        double max_x = elements.firstPoint().getX(); // z-achse
+        double max_y = elements.lastPoint().getY(); // x-achse
+        double min_x = elements.lastPoint().getX();
+        double y_layer = max_y - depth;
+
+        for (int i = 0; i < 100; i++) {
+
+            LineSegment2D l = new LineSegment2D(max_x + 0.01, y_layer - i * depth, min_x - 0.01, y_layer - i * depth);
+
+            ArrayList<Point2D> points = (ArrayList<Point2D>) contour.intersections(l);
+            this.intersect_p.add(points);
+
+            if (points.isEmpty()) {
+                break;
+            }
+
+            if ((points.size() % 2) != 0) {
+                Exception newExcept = new Exception("size of intersection points is odd: " + String.valueOf(points.size()) + ", line number: " + String.valueOf(i) + ", try to change the depth");
+                throw newExcept;
+            }
+
+            for (int j = 0; j < 100; j += 2) {
+                if (points.size() <= (j + 1)) {
+                    break;
+                }
+                Point2D p1 = points.get(j);
+                Point2D p2 = points.get(j + 1);
+                LineSegment2D line = new LineSegment2D(p1, p2);
+                lines.add(line);
+
+            }
+
+        }
+        boolean outer = true;
+        if (depth < 0) {
+            outer = false;
+        }
+        Collections.sort(lines, new LineCompare(outer));
+
+        for (LineSegment2D lout : lines) {
+            System.out.println(lout.firstPoint().getX() + "   :   " + lout.firstPoint().getY());
+        }
+
+        return lines;
     }
 
     /**
@@ -210,16 +311,4 @@ public class GcodeGenerator {
 
     }
 
-    /**
-     *
-     * @param text
-     * @return commented text like: "( I am a comment )"
-     */
-    private String makeComment(String text) {
-        if (control == 1) {
-            return " ( " + text + " ) ";
-        } else {
-            return " ; " + text;
-        }
-    }
 }
