@@ -108,6 +108,72 @@
 
         ]
 
+    },
+ 
+    
+    
+    
+    {
+        "name": "grooving",
+        "arg": [
+            {
+                "type": "real",
+                "name": "start_z",
+                "defaultval": "0.0"
+            },
+            {
+                "type": "real",
+                "name": "start_x",
+                "defaultval": "0.0"
+            },
+            {
+                "type": "real",
+                "name": "end_z",
+                "defaultval": "-10.0"
+            },
+            {
+                "type": "real",
+                "name": "depth",
+                "defaultval": "10.0"
+            },
+            {
+                "type": "real",
+                "name": "width",
+                "defaultval": "2.0"
+            },
+            {
+                "type": "int",
+                "name": "left",
+                "defaultval": "0"
+            },
+            {
+                "type": "real",
+                "name": "overlap",
+                "defaultval": "0.3"
+            },
+           
+            {
+                "type": "real",
+                "name": "mat_allowance_x",
+                "defaultval": "0.1"
+            },
+            {
+                "type": "real",
+                "name": "mat_allowance_z",
+                "defaultval": "0.1"
+            },
+            
+            
+            
+            
+            {
+                "type": "int",
+                "name": "control",
+                "defaultval": "0"
+            }
+
+        ]
+
     }
 
 

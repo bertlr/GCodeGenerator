@@ -36,6 +36,7 @@ import org.roiderh.gcodegeneratordialogs.generators.Roughing;
 import org.roiderh.gcodegeneratordialogs.generators.Translate;
 import org.roiderh.gcodeviewer.contourelement;
 import org.roiderh.gcodeviewer.gcodereader;
+import org.roiderh.gcodegeneratordialogs.generators.Grooving;
 
 /**
  *
@@ -383,12 +384,15 @@ public class DialogGenerateCode extends javax.swing.JDialog implements ActionLis
             } else if (fc.name.compareTo("translate") == 0) {
                 Translate m = new Translate(origCurve, fc, args);
                 txtGcode = m.calculate();
+            } else if (fc.name.compareTo("grooving") == 0) {
+                Grooving m = new Grooving(origCurve, fc, args);
+                txtGcode = m.calculate();
             } else {
                 JOptionPane.showMessageDialog(null, "Error: no valid generator");
                 return;
             }
 
-            JTextArea panelGCode = (JTextArea) (( (((JScrollPane) this.tabOutput.getComponentAt(1)).getViewport()))).getView();
+            JTextArea panelGCode = (JTextArea) (((((JScrollPane) this.tabOutput.getComponentAt(1)).getViewport()))).getView();
             panelGCode.setText(txtGcode);
 
             InputStream is_new = new ByteArrayInputStream(txtGcode.getBytes());

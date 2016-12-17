@@ -16,6 +16,8 @@
  */
 package org.roiderh.gcodegeneratordialogs;
 
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -135,7 +137,6 @@ public class GcodeGenerator {
                     p1 = p1.translate(a, 0);
                 }
             }
-            
 
             // auf kollision testen, nur bei Hinterschnitt           
             for (int j = 0; j < 100; j++) {
@@ -303,11 +304,14 @@ public class GcodeGenerator {
      * to diameter.
      */
     private String format(String axis, double d) {
+        NumberFormat nf = NumberFormat.getNumberInstance(Locale.US);
+        DecimalFormat df = (DecimalFormat) nf;
+        df.applyPattern("0.###");
         if (axis == "x" || axis == "X") {
             d *= 2.0;
-            return String.format(Locale.US, "X%.2f", d);
+            return "X" + df.format(d);
         }
-        return String.format(Locale.US, "Z%.2f", d);
+        return "Z" + df.format(d);
 
     }
 
