@@ -187,7 +187,7 @@ public class AbstractGenerator {
      * @param text
      * @return commented text like: "( I am a comment )"
      */
-    private String makeComment(String text) {
+    public String makeComment(String text) {
         if (control == 1) {
             return " ( " + text + " ) ";
         } else {

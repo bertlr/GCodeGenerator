@@ -109,10 +109,6 @@
         ]
 
     },
- 
-    
-    
-    
     {
         "name": "grooving",
         "arg": [
@@ -133,7 +129,7 @@
             },
             {
                 "type": "real",
-                "name": "depth",
+                "name": "ground_x",
                 "defaultval": "10.0"
             },
             {
@@ -151,7 +147,6 @@
                 "name": "overlap",
                 "defaultval": "0.3"
             },
-           
             {
                 "type": "real",
                 "name": "mat_allowance_x",
@@ -162,10 +157,6 @@
                 "name": "mat_allowance_z",
                 "defaultval": "0.1"
             },
-            
-            
-            
-            
             {
                 "type": "int",
                 "name": "control",

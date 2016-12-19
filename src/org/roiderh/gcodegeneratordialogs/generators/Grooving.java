@@ -41,6 +41,7 @@ public class Grooving extends AbstractGenerator {
         double start_z = 0.0;
         double start_x = 20.0;
         double end_z = -10.0;
+        double ground_x = 0.0;
         double width = 2.0;
         double mat_allowance_x = 0.1;
         double mat_allowance_z = 0.1;
@@ -55,8 +56,8 @@ public class Grooving extends AbstractGenerator {
                 start_x = Double.parseDouble(values.get(i).trim());
             } else if (fc.arg.get(i).name.compareTo("end_z") == 0) {
                 end_z = Double.parseDouble(values.get(i).trim());
-            } else if (fc.arg.get(i).name.compareTo("depth") == 0) {
-                depth = Double.parseDouble(values.get(i).trim());
+            } else if (fc.arg.get(i).name.compareTo("ground_x") == 0) {
+                ground_x = Double.parseDouble(values.get(i).trim());
             } else if (fc.arg.get(i).name.compareTo("width") == 0) {
                 width = Double.parseDouble(values.get(i).trim());
             } else if (fc.arg.get(i).name.compareTo("left") == 0) {
@@ -74,15 +75,24 @@ public class Grooving extends AbstractGenerator {
         }
 
         String output_gcode = "";
-
+        output_gcode += this.makeComment("Begin of generated contour") + "\n";
+        output_gcode += makeComment(fc.name.trim()) + "\n";
+        for (int i = 0; i < fc.arg.size(); i++) {
+            output_gcode += this.makeComment(fc.arg.get(i).name + "=" + values.get(i).trim()) + "\n";
+        }
+        
         GroovingGenerator gcode = new GroovingGenerator();
         gcode.control = control;
         Boolean is_left = true;
-        if(left == 0){
+        if (left == 0) {
             is_left = false;
         }
         start_x /= 2.0;
-        output_gcode = gcode.calcToolpath(orig_contour, depth, start_z, end_z, start_x, new Point2D(mat_allowance_z, mat_allowance_x), width, is_left, overlap);
+        ground_x /= 2.0;
+        depth = ground_x - start_x;
+        output_gcode += gcode.calcToolpath(orig_contour, depth, start_z, end_z, start_x, new Point2D(mat_allowance_z, mat_allowance_x), width, is_left, overlap);
+        output_gcode += this.makeComment("End of generated contour") + "\n";
+        
         return output_gcode;
     }
 

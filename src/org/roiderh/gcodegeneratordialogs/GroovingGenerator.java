@@ -53,7 +53,7 @@ public class GroovingGenerator {
      * @throws Exception
      */
     public String calcToolpath(PolyCirculinearCurve2D<CirculinearElement2D> _elements, double depth, double begin, double end, double starty, Point2D oversize, double width, boolean left, double overlap) throws Exception {
-        String gcode = this.makeComment("Anfang") + "\n";
+        String gcode = "";
         PolyOrientedCurve2D contour = new PolyOrientedCurve2D(_elements);
         ArrayList<Point2D> intersections = new ArrayList<>();
         double curr_pos_x = begin - oversize.getX() - 0.001;
@@ -83,11 +83,11 @@ public class GroovingGenerator {
                     Exception newExcept = new Exception("too much iterations in depth");
                     throw newExcept;
                 }
-                if (Math.abs(current_depth_step) < 0.01) {
+                if (Math.abs(current_depth_step) < 0.001) {
                     gcode += "G1 " + this.format("X", pos.getY()) + "\n";
                     gcode += "G0 " + this.format("X", starty) + "\n";
                     break;
-                }
+                }               
                 pos = pos.translate(0, current_depth_step);
                 LineSegment2D mainside;
                 LineSegment2D secondside;
@@ -119,7 +119,16 @@ public class GroovingGenerator {
                 if (intersections.isEmpty()) {
                     intersections = (ArrayList<Point2D>) contour.intersections(ground);
                 }
-
+                // no intersection at full allowed depth, break with max. depth:
+                if(i==0 && intersections.isEmpty()){
+                    double y = starty + depth;
+                    gcode += "G1 " + this.format("X", y) + "\n";
+                    gcode += "G0 " + this.format("X", starty) + "\n";
+                    break;
+                    
+                }
+                
+                
                 current_depth_step /= 2.0;
                 if (intersections.isEmpty()) {
                     if (depth < 0) {
@@ -144,7 +153,6 @@ public class GroovingGenerator {
 
         }
         
-        gcode += this.makeComment("End") + "\n";
         return gcode;
     }
 
