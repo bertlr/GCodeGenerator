@@ -113,6 +113,7 @@ public class AbstractGenerator {
         ArrayList<CirculinearElement2D> el = (ArrayList<CirculinearElement2D>) new_curve.curves();
         for (int i = 0; i < el.size(); i++) {
             CirculinearElement2D curve = el.get(i);
+            double dist = 0.0;
             if (i == 0) {
                 curX = curve.firstPoint().getX();
                 curY = curve.firstPoint().getY();
@@ -125,25 +126,28 @@ public class AbstractGenerator {
             curX = curve.lastPoint().getX();
             curY = curve.lastPoint().getY();
 
-            if (curve.toString().contains("CircleArc2D")) {
-                CircleArc2D c = (CircleArc2D) curve;
-                if (c.isDirect()) {
-                    output_gcode += "G3";
-                } else {
-                    output_gcode += "G2";
-                }
-                output_gcode += format("R", c.supportingCircle().radius());
+            dist = Math.abs(curY - prevY) + Math.abs(curX - prevX);
+            if (dist > 0.001) {
+                if (curve.toString().contains("CircleArc2D")) {
+                    CircleArc2D c = (CircleArc2D) curve;
+                    if (c.isDirect()) {
+                        output_gcode += "G3";
+                    } else {
+                        output_gcode += "G2";
+                    }
+                    output_gcode += format("R", c.supportingCircle().radius());
 
-            } else {
-                output_gcode += "G1";
+                } else {
+                    output_gcode += "G1";
+                }
+                if (Math.abs(curY - prevY) > 0.0005) {
+                    output_gcode += format("X", curY);
+                }
+                if (Math.abs(curX - prevX) > 0.0005) {
+                    output_gcode += format("Z", curX);
+                }
+                output_gcode += "\n";
             }
-            if (Math.abs(curY - prevY) > 0.001) {
-                output_gcode += format("X", curY);
-            }
-            if (Math.abs(curX - prevX) > 0.001) {
-                output_gcode += format("Z", curX);
-            }
-            output_gcode += "\n";
 
             prevX = curX;
             prevY = curY;
