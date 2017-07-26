@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 by Herbert Roider <herbert.roider@utanet.at>
+ * Copyright (C) 2017 by Herbert Roider <herbert@roider.at>
  * 
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -34,16 +34,17 @@ import math.geom2d.Point2D;
 import math.geom2d.line.LineSegment2D;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.ListIterator;
 import math.geom2d.circulinear.CirculinearElement2D;
-import math.geom2d.polygon.LinearCurve2D;
 import org.roiderh.gcodeviewer.customfunc.SinCosTan;
 
 /**
  *
- * @author Herbert Roider <herbert.roider@utanet.at>
+ * @author Herbert Roider <herbert@roider.at>
  */
 public class gcodereader {
 
+    private int machine = -1; // 840D, spinner = 0, 810T, emco = 1
     public int linenumber_offset = 0;
     /**
      * Holds the Error messages since last function read call.
@@ -77,18 +78,21 @@ public class gcodereader {
         double CHR = Double.MAX_VALUE;
         double RND = Double.MAX_VALUE;
 
-        int machine = 0; // spinner = 0, emco = 1
+        //int machine = 0; // spinner = 0, emco = 1
         int linenumber = 0;
 
-        geometry geo = new geometry();
+        //geometry geo = new geometry();
         // R Parameters:
         Map<Integer, Double> R = new HashMap<>();
         //Pattern floatstring = Pattern.compile("(=)?(-)?([0-9])*.?([0-9])*");
         //Pattern integerstring = Pattern.compile("(=)?(-)?([0-9])+");
         point last_pos = null;
-        point current_pos = new point();
+        point current_pos = null;
+
+        contourelement c_elem = null;
+        //contourelement prev_c_elem = null;
         // All points to display:
-        LinkedList<point> points = new LinkedList<>();
+        //LinkedList<point> points = new LinkedList<>();
         LinkedList<contourelement> contour = new LinkedList<>();
         G0 = true;
         G1 = false;
@@ -128,6 +132,8 @@ public class gcodereader {
             X_prev = X;
             Y_prev = Y;
             Z_prev = Z;
+
+            int active_axis = 0; // 1= x-axis (horizontal movement), 2=y-axis (vertical)
 
             istream = new ByteArrayInputStream(line.getBytes());
             Gcodereader gr = new Gcodereader(istream);
@@ -276,12 +282,15 @@ public class gcodereader {
                         System.out.println("key " + para.name + " = " + val);
                         switch (para.name) {
                             case "X":
+                                active_axis += 2; // y-axis (vertical movement)
                                 X = val;
                                 break;
                             case "Y":
+                                //active_axis += 2; // not used
                                 Y = val;
                                 break;
                             case "Z":
+                                active_axis += 1; // x-axis (horizontal movement)
                                 Z = val;
                                 break;
 
@@ -297,20 +306,20 @@ public class gcodereader {
 
                             case "B":
                                 B = val;
-                                machine = 1; // emco
+                                setMachine(1); // emco
                                 break;
                             case "CR":
                                 CR = val;
-                                machine = 0; // spinner
+                                setMachine(0); // spinner
                                 break;
 
                             case "CHR":
                                 CHR = val;
-                                machine = 0;
+                                setMachine(0);
                                 break;
                             case "RND":
                                 RND = val;
-                                machine = 0;
+                                setMachine(0);
                                 break;
 
                         }
@@ -331,13 +340,16 @@ public class gcodereader {
                 CalcException newExcept = new CalcException("X and Z value are necessary for the first point");
                 throw newExcept;
             }
+
+            current_pos = new point();
             current_pos.x = Z;
             current_pos.y = X / 2.0;
             if (last_pos == null) {
                 last_pos = current_pos.clone();
+
             }
 
-            contourelement c_elem = new contourelement();
+            c_elem = new contourelement();
             c_elem.linenumber = linenumber;
 
             // Transition Element:
@@ -389,8 +401,8 @@ public class gcodereader {
                 }
 
                 //c_elem.points = geo.circle(last_pos, current_pos, r, ccw);
-                c_elem.points.add(last_pos.clone());
-                c_elem.points.add(current_pos.clone());
+                c_elem.points.add(last_pos);
+                c_elem.points.add(current_pos);
                 c_elem.radius = r;
                 c_elem.ccw = ccw;
                 // no Transition Element at G2 or G3
@@ -401,51 +413,65 @@ public class gcodereader {
                 //}
             } else if (G1) {
                 //points.add(current_pos.clone());
-                c_elem.points.add(last_pos.clone());
-                c_elem.points.add(current_pos.clone());
+                c_elem.points.add(last_pos);
+                c_elem.points.add(current_pos);
                 c_elem.shape = contourelement.Shape.LINE;
                 c_elem.feed = contourelement.Feed.CUTTING;
 
             } else if (G0) {
                 //points.add(current_pos.clone());
-                c_elem.points.add(last_pos.clone());
-                c_elem.points.add(current_pos.clone());
+                c_elem.points.add(last_pos);
+                c_elem.points.add(current_pos);
                 c_elem.shape = contourelement.Shape.LINE;
                 c_elem.feed = contourelement.Feed.RAPID;
                 c_elem.transition_elem_size = 0.0;
 
             }
+//            c_elem.axis_movement = active_axis;
+//            switch(active_axis){
+//                case 1:
+//                    c_elem.x_free = false;
+//                    c_elem.y_free = true;
+//                    c_elem.angle_free = false;
+//                    break;
+//                case 2:
+//                    c_elem.x_free = true;
+//                    c_elem.y_free = false;
+//                    c_elem.angle_free = false;
+//            }
             // add point only when movement
             if (!last_pos.equals(current_pos) || contour.size() == 0) {
                 contour.add(c_elem);
             }
-            last_pos = current_pos.clone();
-            //}
+            last_pos = current_pos;
 
         }
+        return contour;
+    }
 
-        // Add a last Dummy Element with the same Coordinates as the last elements, so the way is 0:
-        contourelement c_elem = new contourelement();
-        c_elem.linenumber = Integer.MAX_VALUE;
-        c_elem.points.add(last_pos.clone());
-        c_elem.points.add(current_pos.clone());
-        c_elem.shape = contourelement.Shape.LINE;
-        c_elem.feed = contourelement.Feed.RAPID;
-        c_elem.transition_elem_size = 0.0;
-        c_elem.start = last_pos.createPoint2D();
-        c_elem.end = current_pos.createPoint2D();
+    /**
+     * Calc the Contour elements as transition elements and curves
+     *
+     * @param contour Raw conturelements
+     * @return
+     */
+    public LinkedList<contourelement> calc_contour(LinkedList<contourelement> contour) {
 
-        contour.add(c_elem);
+        geometry geo = new geometry();
 
-        // Create Contour points to display from Program Lines:
-        boolean is_first = true;
+// Create Contour points to display from Program Lines:
+        //boolean is_first = true;
         // points ready for display
-        LinkedList<Point2D> disp = new LinkedList<>();
+        //LinkedList<Point2D> disp = new LinkedList<>();
         contourelement current_ce = null;
+        contourelement next_ce = null;
+        ListIterator<contourelement> listIterator = contour.listIterator();
 
         // calculate the transitions elements and the result vertexes and tangent points.
         // Also add points to the display contour, which is simple a chain of lines.
-        for (contourelement next_ce : contour) {
+        //for (contourelement next_ce : contour) {
+        while (listIterator.hasNext()) {
+            next_ce = listIterator.next();
             // First contour element:
             if (current_ce == null) {
                 current_ce = next_ce;
@@ -473,6 +499,9 @@ public class gcodereader {
                 this.messages.add("cannot calculate the element in line: " + current_ce.linenumber);
                 break;
             }
+
+            current_ce.curve = current;
+
             if (next_ce.shape == contourelement.Shape.ARC) {
                 next = geo.createCircleArc(next_ce.points.getFirst().createPoint2D(), next_ce.points.getLast().createPoint2D(), next_ce.radius, next_ce.ccw);
 
@@ -485,7 +514,7 @@ public class gcodereader {
                 break;
 
             }
-            current_ce.curve = current;
+
 
             /*
              calculate the transition element and the new vertexes for the 2 elements:
@@ -518,104 +547,50 @@ public class gcodereader {
             current_ce = next_ce;
         }
 
-        System.out.println("Contur without transition elements");
-        for (contourelement ce : contour) {
-
-            for (point p : ce.points) {
-                System.out.println("x=" + p.x + ", y=" + p.y);
-
-            }
-
-        }
-        if (this.messages.size() > 0) {
-            for (String s : this.messages) {
-                System.out.println(s);
-            }
-
+        // Calculate the last element without transition element:
+        current_ce.end = current_ce.points.getLast().createPoint2D();
+        if (current_ce.shape == contourelement.Shape.ARC) {
+            current_ce.curve = geo.createCircleArc(current_ce.start, current_ce.end, current_ce.radius, current_ce.ccw);
+        } else {
+            current_ce.curve = new LineSegment2D(current_ce.start, current_ce.end);
         }
 
+//        System.out.println("Contur without transition elements");
+//        for (contourelement ce : contour) {
+//
+//            for (point p : ce.points) {
+//                System.out.println("x=" + p.x + ", y=" + p.y);
+//
+//            }
+//
+//        }
+//        if (this.messages.size() > 0) {
+//            for (String s : this.messages) {
+//                System.out.println(s);
+//            }
+//
+//        }
         return contour;
     }
 
     /**
-     * create a list with all edge points to display. Circles are returned as
-     * multiple points.
      *
-     * @param contour
-     * @return list with all points
+     * @return 840D = 0, 810T = 1
      */
-    public LinkedList<Point2D> create_display_points(LinkedList<contourelement> contour) {
-        geometry geo = new geometry();
-        LinkedList<Point2D> disp = new LinkedList<>();
-
-        // calculate the transitions elements and the result vertexes and tangent points.
-        // Also add points to the display contour, which is simple a chain of lines.
-        for (contourelement current_ce : contour) {
-
-            if (current_ce.curve == null) {
-                continue;
-            }
-            /*
-             Add the current element to the contour as multiple lines.
-             */
-            if (current_ce.shape == contourelement.Shape.ARC) {
-                LinearCurve2D c1 = current_ce.curve.asPolyline(10);
-                //Polyline2D pl = c1;
-                for (Point2D p : c1.vertices()) {
-                    disp.add(p);
-                }
-            } else {
-                LinearCurve2D c1 = current_ce.curve.asPolyline(1);
-                //Polyline2D pl = c1;
-                for (Point2D p : c1.vertices()) {
-                    disp.add(p);
-                }
-
-            }
-            /*
-             Append the transition element to the current element for display: 
-             */
-            if (current_ce.transition_elem_size > 0) {
-                if (current_ce.transistion_elem == contourelement.Transition.ROUND) {
-                    LinearCurve2D pl = current_ce.transition_curve.asPolyline(10);
-                    for (Point2D p : pl.vertices()) {
-                        disp.add(p);
-                    }
-
-                } else if (current_ce.transistion_elem == contourelement.Transition.CHAMFER) {
-                    LinearCurve2D pl = current_ce.transition_curve.asPolyline(1);
-                    for (Point2D p : pl.vertices()) {
-                        disp.add(p);
-                    }
-
-                }
-            }
-
-            //current_ce = next_ce;
+    public int getMachine() {
+        if(this.machine == -1){
+            return 0;
         }
-
-        System.out.println("Contur without transition elements");
-        for (contourelement ce : contour) {
-
-            for (point p : ce.points) {
-                System.out.println("x=" + p.x + ", y=" + p.y);
-
-            }
-
+        return this.machine;
+    }
+    /**
+     * 
+     * @param _m   840D = 0, 810T = 1
+     */
+    private void setMachine(int _m){
+        if(this.machine == -1){
+            this.machine = _m;
         }
-        if (this.messages.size() > 0) {
-            for (String s : this.messages) {
-                System.out.println(s);
-            }
-
-        }
-//                System.out.println("ready calculated Contur");
-//                for (point p : disp) {
-//                        System.out.println("x=" + p.x + ", y=" + p.y);
-//
-//                }
-        return disp;
-
     }
 
 }

@@ -40,28 +40,49 @@ public class ContourPlot extends JPanel {
     public PolyCirculinearCurve2D<CirculinearElement2D> origCurve;
     public PolyCirculinearCurve2D<CirculinearElement2D> newCurve;
 
+    private math.geom2d.Box2D getBoundingBox(PolyCirculinearCurve2D<CirculinearElement2D> c_el) {
+
+        //c_el.add(new Line2D(c_el.getLast().lastPoint(), c_el.getFirst().firstPoint()));
+        math.geom2d.Box2D bb = null;
+        math.geom2d.Box2D bb1 = null;
+        for (int i = 0; i < c_el.size(); i++) {
+            CirculinearElement2D el = c_el.get(i);
+            bb1 = el.boundingBox();
+            if (bb1 == null) {
+                return null;
+            }
+            if (i == 0) {
+                bb = bb1;
+
+            } else {
+                bb = bb.union(bb1);
+            }
+
+        }
+        return bb;
+
+    }
+
     private void doDrawing(Graphics g) {
         if (this.origCurve == null) {
             return;
         }
+        if (newCurve == null) {
+            return;
+        }
+
+        PolyCirculinearCurve2D<CirculinearElement2D> new_curve = newCurve;
+        PolyCirculinearCurve2D<CirculinearElement2D> orig_curve = origCurve;
 
         int canvas_width = this.getWidth();
         int canvas_height = this.getHeight();
 
         Graphics2D g2d = (Graphics2D) g;
 
-        PolyCirculinearCurve2D<CirculinearElement2D> orig_curve = origCurve;
+        Box2D bb = this.getBoundingBox(orig_curve);
+        Box2D bb_new = this.getBoundingBox(new_curve);
+        bb = bb.union(bb_new);
 
-        // only to determine the bounding box of all 2 curves:
-        PolyCirculinearCurve2D<CirculinearElement2D> closed_c = new PolyCirculinearCurve2D<>(origCurve.curves());
-        //closed_c.add(newCurve.continuousCurves());
-        for(CirculinearElement2D el : newCurve){
-           closed_c.add(el);
-        }
-        // close curve for the boundingBox, otherwise last elements are not included, don't know why:
-        closed_c.add(new Line2D(closed_c.lastPoint(), closed_c.firstPoint()));
-
-        Box2D bb = closed_c.boundingBox();
         double max_x = bb.getMaxX();
         double min_x = bb.getMinX();
         double max_y = bb.getMaxY();
@@ -86,10 +107,6 @@ public class ContourPlot extends JPanel {
         g2d.setColor(Color.green);
         orig_curve.transform(mir).transform(sca).transform(tra).draw(g2d);
 
-        if (newCurve == null) {
-            return;
-        }
-        PolyCirculinearCurve2D<CirculinearElement2D> new_curve = newCurve;
         g2d.setColor(Color.RED);
         new_curve.transform(mir).transform(sca).transform(tra).draw(g2d);
         // draw a circle at the end of the curve

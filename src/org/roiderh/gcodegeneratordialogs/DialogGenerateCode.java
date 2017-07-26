@@ -50,7 +50,7 @@ public class DialogGenerateCode extends javax.swing.JDialog implements ActionLis
      */
     public String g_code;
     private java.util.ArrayList<JTextField> jFormattedFields;
-    int machine = 0;
+    //int machine = 0;
 
     /**
      * Creates new form DialogBackTranslationFunction
@@ -334,7 +334,7 @@ public class DialogGenerateCode extends javax.swing.JDialog implements ActionLis
                 continue;
             }
             if (current_ce.curve.length() == 0) {
-                continue;
+                //continue;
             }
             elements.add(current_ce.curve);
 
@@ -364,6 +364,11 @@ public class DialogGenerateCode extends javax.swing.JDialog implements ActionLis
 
             InputStream is = new ByteArrayInputStream(this.g_code.getBytes());
             LinkedList<contourelement> origPath = gr.read(is);
+            if (origPath.isEmpty()) {
+                return;
+            }
+            gr.calc_contour(origPath);
+
             origCurve = this.cleanup_contour(origPath);
 
             if (fc.name.compareTo("roughing") == 0) {
@@ -396,7 +401,14 @@ public class DialogGenerateCode extends javax.swing.JDialog implements ActionLis
             panelGCode.setText(txtGcode);
 
             InputStream is_new = new ByteArrayInputStream(txtGcode.getBytes());
+            
+            // create a new gcodereader for every parsing job, especially when the machine is not the same
+            gr = new gcodereader();
             LinkedList<contourelement> newPath = gr.read(is_new);
+            if (newPath.isEmpty()) {
+                return;
+            }
+            gr.calc_contour(newPath);
 
             newCurve = this.cleanup_contour(newPath);
 
