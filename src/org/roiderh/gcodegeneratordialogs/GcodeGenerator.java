@@ -256,11 +256,13 @@ public class GcodeGenerator {
         double y_layer = max_y - depth;
 
         for (int i = 0; i < 100; i++) {
-
-            LineSegment2D l = null;
             ArrayList<Point2D> points = null;
+            double offset = 0.001;
+            if(depth < 0){
+                offset *= -1;
+            }
             for (int j = 0; j < 3; j++) {
-                l = new LineSegment2D(max_x + 0.01, y_layer - i * depth + 0.001 * j, min_x - 0.01, y_layer - i * depth + 0.001 * j);
+                LineSegment2D l = new LineSegment2D(max_x + 0.01, y_layer - i * depth + offset * j, min_x - 0.01, y_layer - i * depth + offset * j);
                 points = (ArrayList<Point2D>) contour.intersections(l);
                 if (points.isEmpty()) {
                     break;
