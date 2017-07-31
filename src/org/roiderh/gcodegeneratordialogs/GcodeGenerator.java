@@ -258,7 +258,7 @@ public class GcodeGenerator {
         for (int i = 0; i < 100; i++) {
             ArrayList<Point2D> points = null;
             double offset = 0.001;
-            if(depth < 0){
+            if (depth < 0) {
                 offset *= -1;
             }
             for (int j = 0; j < 3; j++) {
