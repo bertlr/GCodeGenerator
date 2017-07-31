@@ -257,11 +257,22 @@ public class GcodeGenerator {
 
         for (int i = 0; i < 100; i++) {
 
-            LineSegment2D l = new LineSegment2D(max_x + 0.01, y_layer - i * depth, min_x - 0.01, y_layer - i * depth);
-
-            ArrayList<Point2D> points = (ArrayList<Point2D>) contour.intersections(l);
-            this.intersect_p.add(points);
-
+            LineSegment2D l = null;
+            ArrayList<Point2D> points = null;
+            for (int j = 0; j < 3; j++) {
+                l = new LineSegment2D(max_x + 0.01, y_layer - i * depth + 0.001 * j, min_x - 0.01, y_layer - i * depth + 0.001 * j);
+                points = (ArrayList<Point2D>) contour.intersections(l);
+                if (points.isEmpty()) {
+                    break;
+                }
+                if ((points.size() % 2) == 0) {
+                    break;
+                }
+            }
+            if (points == null) {
+                Exception newExcept = new Exception("list of intersection points is null");
+                throw newExcept;
+            }
             if (points.isEmpty()) {
                 break;
             }
@@ -270,6 +281,8 @@ public class GcodeGenerator {
                 Exception newExcept = new Exception("size of intersection points is odd: " + String.valueOf(points.size()) + ", line number: " + String.valueOf(i) + ", try to change the depth");
                 throw newExcept;
             }
+
+            this.intersect_p.add(points);
 
             for (int j = 0; j < 100; j += 2) {
                 if (points.size() <= (j + 1)) {
