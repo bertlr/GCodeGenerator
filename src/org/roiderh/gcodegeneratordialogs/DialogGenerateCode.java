@@ -334,7 +334,7 @@ public class DialogGenerateCode extends javax.swing.JDialog implements ActionLis
                 continue;
             }
             if (current_ce.curve.length() == 0) {
-                //continue;
+                continue;
             }
             elements.add(current_ce.curve);
 
