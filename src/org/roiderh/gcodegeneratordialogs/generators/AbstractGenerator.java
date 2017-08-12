@@ -78,7 +78,7 @@ public class AbstractGenerator {
                 continue;
             }
             if (current_ce.curve.length() == 0) {
-                continue;
+                continue; // the first element has length of 0
             }
             clean_contour.add(current_ce.curve);
 
