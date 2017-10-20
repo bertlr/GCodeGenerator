@@ -68,7 +68,8 @@ public class GcodeGenerator {
         PolyCirculinearCurve2D<CirculinearElement2D> elements = new PolyCirculinearCurve2D<>(_elements.curves());
 
         // Am Anfang eine Linie anhängen, damit die Contour vorne geschlossen ist:
-        elements.add(0, new LineSegment2D(new Point2D(elements.firstPoint().getX(), elements.lastPoint().y()), elements.firstPoint()));
+        //elements.add(0, new LineSegment2D(elements.firstPoint().translate(1.0, 0.0), elements.firstPoint()));
+        elements.add(0, new LineSegment2D(new Point2D(elements.firstPoint().getX() + 1.0, elements.lastPoint().y()), elements.firstPoint().translate(1.0, 0.0)));
 
         gcode += makeComment("Schneidenradius: " + String.valueOf(toolNoseRadius)) + "\n";
         gcode += makeComment("Aufmass x=" + String.valueOf(oversize.getY()) + " , z=" + String.valueOf(oversize.getX())) + "\n";
@@ -157,15 +158,16 @@ public class GcodeGenerator {
             p4 = p3.translate(Math.abs(0.7 * depth) / Math.tan(plunging_angle), (0.7 * depth));
 
             if (p2.getX() - p3.getX() < 0) {
+                // radius of cutting edge is to big for move in undercut
                 //System.out.println("Eintauchen in Hinterschnitt macht keinen Sinn, weil Schneidenradius zu groß ist");
-                break;
+            } else {
+                System.out.println(p2.toString() + " -- " + p3.toString());
+                gcode += "G0 " + this.format("X", p1.getY()) + " " + this.format("Z", p1.getX()) + "\n";
+                gcode += "G1 " + this.format("X", p2.getY()) + " " + this.format("Z", p2.getX()) + "\n"; // move to the depth of the cut
+                gcode += "G1 " + this.format("Z", p3.getX()) + "\n";                                    // cut the layer
+                gcode += "G1 " + this.format("X", p4.getY()) + " " + this.format("Z", p4.getX()) + "\n"; // drive away from contour
+                prev_p2 = p2;
             }
-            System.out.println(p2.toString() + " -- " + p3.toString());
-            gcode += "G0 " + this.format("X", p1.getY()) + " " + this.format("Z", p1.getX()) + "\n";
-            gcode += "G1 " + this.format("X", p2.getY()) + " " + this.format("Z", p2.getX()) + "\n"; // move to the depth of the cut
-            gcode += "G1 " + this.format("Z", p3.getX()) + "\n";                                    // cut the layer
-            gcode += "G1 " + this.format("X", p4.getY()) + " " + this.format("Z", p4.getX()) + "\n"; // drive away from contour
-            prev_p2 = p2;
 
         }
         gcode += "G0 " + this.format("X", elements.lastPoint().getY() + 0.1 * depth + oversize.getY()) + "\n";
@@ -253,7 +255,7 @@ public class GcodeGenerator {
         double max_x = elements.firstPoint().getX(); // z-achse
         double max_y = elements.lastPoint().getY(); // x-achse
         double min_x = elements.lastPoint().getX();
-        double y_layer = max_y - depth;
+        double y_layer = max_y;
 
         for (int i = 0; i < 100; i++) {
             ArrayList<Point2D> points = null;
@@ -261,8 +263,9 @@ public class GcodeGenerator {
             if (depth < 0) {
                 offset *= -1;
             }
+            y_layer -= depth;
             for (int j = 0; j < 3; j++) {
-                LineSegment2D l = new LineSegment2D(max_x + 0.01, y_layer - i * depth + offset * j, min_x - 0.01, y_layer - i * depth + offset * j);
+                LineSegment2D l = new LineSegment2D(max_x + 0.01, y_layer + offset * j, min_x - 0.01, y_layer + offset * j);
                 points = (ArrayList<Point2D>) contour.intersections(l);
                 if (points.isEmpty()) {
                     break;
