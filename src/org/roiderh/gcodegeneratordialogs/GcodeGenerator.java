@@ -45,7 +45,7 @@ public class GcodeGenerator {
     public ArrayList< ArrayList<Point2D>> intersect_p = new ArrayList<>();
     private PolyCirculinearCurve2D<CirculinearElement2D> orig_contour;
 
-    /**
+    /** create the c-code for roughing a contour. 
      *
      * @param _elements contour, y is the radius, x is the length
      * @param depth max depth in radius
