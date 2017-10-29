@@ -89,6 +89,9 @@ public class DialogSelectGenerator extends javax.swing.JDialog {
         setTitle(org.openide.util.NbBundle.getMessage(DialogSelectGenerator.class, "DialogGenerateCode.title")); // NOI18N
 
         org.openide.awt.Mnemonics.setLocalizedText(jButtonOk, org.openide.util.NbBundle.getMessage(DialogSelectGenerator.class, "DialogSelectGenerator.jButtonOk.text")); // NOI18N
+        jButtonOk.setMaximumSize(new java.awt.Dimension(200, 25));
+        jButtonOk.setMinimumSize(new java.awt.Dimension(100, 25));
+        jButtonOk.setPreferredSize(new java.awt.Dimension(100, 25));
         jButtonOk.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButtonOkActionPerformed(evt);
@@ -105,6 +108,9 @@ public class DialogSelectGenerator extends javax.swing.JDialog {
         jScrollPane1.setViewportView(listFunctions);
 
         org.openide.awt.Mnemonics.setLocalizedText(jButtonCancel, org.openide.util.NbBundle.getMessage(DialogSelectGenerator.class, "DialogSelectGenerator.jButtonCancel.text")); // NOI18N
+        jButtonCancel.setMaximumSize(new java.awt.Dimension(200, 25));
+        jButtonCancel.setMinimumSize(new java.awt.Dimension(100, 25));
+        jButtonCancel.setPreferredSize(new java.awt.Dimension(100, 25));
         jButtonCancel.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButtonCancelActionPerformed(evt);
@@ -142,8 +148,8 @@ public class DialogSelectGenerator extends javax.swing.JDialog {
                     .addComponent(jScrollPane2))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jButtonOk)
-                    .addComponent(jButtonCancel))
+                    .addComponent(jButtonOk, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jButtonCancel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addContainerGap())
         );
 

@@ -121,8 +121,8 @@ public class DialogGenerateCode extends javax.swing.JDialog implements ActionLis
         for (int i = 0; i < fc.arg.size(); i++) {
             jFormattedFields.get(i).addFocusListener(this);
             jFormattedFields.get(i).addActionListener(this);
-            jFormattedFields.get(i).setPreferredSize(new Dimension(80, 16));
-            jFormattedFields.get(i).setMinimumSize(new Dimension(60, 16));
+            jFormattedFields.get(i).setPreferredSize(new Dimension(80, 20));
+            jFormattedFields.get(i).setMinimumSize(new Dimension(60, 20));
         }
 
         for (int i = 0; i < fc.arg.size(); i++) {
@@ -224,9 +224,15 @@ public class DialogGenerateCode extends javax.swing.JDialog implements ActionLis
         });
 
         org.openide.awt.Mnemonics.setLocalizedText(jButtonOk, org.openide.util.NbBundle.getMessage(DialogGenerateCode.class, "DialogGenerateCode.jButtonOk.text")); // NOI18N
+        jButtonOk.setMaximumSize(new java.awt.Dimension(200, 25));
+        jButtonOk.setMinimumSize(new java.awt.Dimension(100, 25));
+        jButtonOk.setPreferredSize(new java.awt.Dimension(100, 25));
 
         org.openide.awt.Mnemonics.setLocalizedText(jButtonCancel, org.openide.util.NbBundle.getMessage(DialogGenerateCode.class, "DialogGenerateCode.jButtonCancel.text")); // NOI18N
         jButtonCancel.setActionCommand(org.openide.util.NbBundle.getMessage(DialogGenerateCode.class, "DialogGenerateCode.jButtonCancel.actionCommand")); // NOI18N
+        jButtonCancel.setMaximumSize(new java.awt.Dimension(200, 25));
+        jButtonCancel.setMinimumSize(new java.awt.Dimension(100, 25));
+        jButtonCancel.setPreferredSize(new java.awt.Dimension(100, 25));
 
         listPane.setLayout(new java.awt.GridBagLayout());
 
@@ -244,9 +250,9 @@ public class DialogGenerateCode extends javax.swing.JDialog implements ActionLis
                     .addComponent(tabOutput)
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                         .addGap(0, 0, Short.MAX_VALUE)
-                        .addComponent(jButtonOk)
+                        .addComponent(jButtonOk, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jButtonCancel))
+                        .addComponent(jButtonCancel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                         .addComponent(listPane, javax.swing.GroupLayout.PREFERRED_SIZE, 567, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
@@ -264,8 +270,8 @@ public class DialogGenerateCode extends javax.swing.JDialog implements ActionLis
                 .addComponent(tabOutput, javax.swing.GroupLayout.DEFAULT_SIZE, 408, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jButtonCancel)
-                    .addComponent(jButtonOk))
+                    .addComponent(jButtonCancel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jButtonOk, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addContainerGap())
         );
 

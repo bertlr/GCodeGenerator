@@ -28,7 +28,7 @@ The created toolpath. The green line is the contour from the selected g-code, th
 
 ![graphic view of the toolpath](screen_4.png)
 
-The g-code for roughing. Select this code and copy it with <kbd>strg</kbd>+<kbd>C</kbd>  and paste it with <kbd>strg</kbd>+<kbd>V</kbd> where ever you want.
+The g-code for roughing. Select this code with <kbd>strg</kbd>+<kbd>A</kbd> and copy it with <kbd>strg</kbd>+<kbd>C</kbd>  and paste it with <kbd>strg</kbd>+<kbd>V</kbd> where ever you want.
 
 ![generated g-code](screen_5.png)
 
