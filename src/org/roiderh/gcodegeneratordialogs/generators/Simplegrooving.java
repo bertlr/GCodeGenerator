@@ -16,7 +16,10 @@
  */
 package org.roiderh.gcodegeneratordialogs.generators;
 
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
 import java.util.ArrayList;
+import java.util.Locale;
 //import math.geom2d.Point2D;
 import math.geom2d.circulinear.CirculinearElement2D;
 import math.geom2d.circulinear.PolyCirculinearCurve2D;
@@ -70,15 +73,21 @@ public class Simplegrooving extends AbstractGenerator {
         }
         double dCount = (int) Math.ceil((start_x - ground_x) / depth);
         depth = ((start_x - ground_x) / dCount);
-        output_gcode += "G0 X" + (start_x + safety_dist) + " Z" + start_z + "\n";
+
+        NumberFormat nf = NumberFormat.getNumberInstance(Locale.US);
+        DecimalFormat df = (DecimalFormat) nf;
+        df.applyPattern("0.###");
+
+        output_gcode += "G0 X" + df.format(start_x + safety_dist) + " Z" + df.format(start_z) + "\n";
 
         for (int i = 0; i < (int) dCount; i++) {
             double new_x = start_x - i * depth;
-            output_gcode += "G0 X" + (new_x + safety_dist) + "\n";
-            output_gcode += "G1 X" + (new_x - depth) + "\n";
-            output_gcode += "G0 X" + (start_x + safety_dist) + "\n";
+            output_gcode += "G0 X" + df.format(new_x + safety_dist) + "\n";
+            output_gcode += "G1 X" + df.format(new_x - depth) + "\n";
+            output_gcode += "G0 X" + df.format(start_x + safety_dist) + "\n";
         }
         output_gcode += this.makeComment("End of generated contour") + "\n";
         return output_gcode;
+
     }
 }
