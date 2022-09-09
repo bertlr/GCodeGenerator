@@ -165,6 +165,45 @@
 
         ]
 
+    },
+    {
+        "name": "simplegrooving",
+        "arg": [
+           
+            {
+                "type": "real",
+                "name": "start_x",
+                "defaultval": "20.0"
+            },
+            {
+                "type": "real",
+                "name": "start_z",
+                "defaultval": "0.0"
+            },
+          
+            {
+                "type": "real",
+                "name": "ground_x",
+                "defaultval": "0.0"
+            },
+            {
+                "type": "real",
+                "name": "depth",
+                "defaultval": "3"
+            },
+            {
+                "type": "real",
+                "name": "safety_dist",
+                "defaultval": "0.2"
+            },
+            {
+                "type": "int",
+                "name": "control",
+                "defaultval": "0"
+            }
+
+        ]
+
     }
 
 

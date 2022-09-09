@@ -37,6 +37,7 @@ import org.roiderh.gcodegeneratordialogs.generators.Translate;
 import org.roiderh.gcodeviewer.contourelement;
 import org.roiderh.gcodeviewer.gcodereader;
 import org.roiderh.gcodegeneratordialogs.generators.Grooving;
+import org.roiderh.gcodegeneratordialogs.generators.Simplegrooving;
 
 /**
  *
@@ -397,6 +398,9 @@ public class DialogGenerateCode extends javax.swing.JDialog implements ActionLis
                 txtGcode = m.calculate();
             } else if (fc.name.compareTo("grooving") == 0) {
                 Grooving m = new Grooving(origCurve, fc, args);
+                txtGcode = m.calculate();
+            } else if (fc.name.compareTo("simplegrooving") == 0) {
+                Simplegrooving m = new Simplegrooving(origCurve, fc, args);
                 txtGcode = m.calculate();
             } else {
                 JOptionPane.showMessageDialog(null, "Error: no valid generator");
