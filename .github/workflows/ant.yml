@@ -1,0 +1,60 @@
+# This workflow will build a Java project with Ant
+# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-java-with-ant
+
+name: Java CI
+on:
+  push:
+    tags:
+      - '*'
+permissions: write-all
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    name: Create Release
+    
+    steps:
+    - uses: actions/checkout@v4
+      name: Checkout project
+    
+    - uses: actions/setup-java@v4
+      name: Set up JDK
+      with:
+        java-version: '22'
+        distribution: 'temurin'
+        java-package: 'jdk'
+    
+    # Setup netbeans distribution directory on github workspace.
+    - uses: cjmach/setup-netbeans-action@v2.1
+      name: Setup NetBeans distribution
+      with:
+        version: '22'  
+    
+    # Run the ant command, with the required NetBeans properties set.
+    - name: Run the Ant build target
+      run: >-
+        ant -noinput -buildfile build.xml
+        -Dnbplatform.default.netbeans.dest.dir=${{ github.workspace }}/netbeans
+        -Dnbplatform.default.harness.dir=${{ github.workspace }}/netbeans/harness
+        -Dcontinue.after.failing.tests=true -Ddo.not.clean.module.config.xml=true clean build
+      # Run the ant command, with the required NetBeans properties set.
+    - name: Run the Ant build target to create the netbeans module
+      run: >-
+        ant -noinput -buildfile build.xml
+        -Dnbplatform.default.netbeans.dest.dir=${{ github.workspace }}/netbeans
+        -Dnbplatform.default.harness.dir=${{ github.workspace }}/netbeans/harness
+        -Dcontinue.after.failing.tests=true nbm 
+    
+    - name: create zip
+      run: | 
+        zip --junk-paths org-roiderh-gcodegenerator build/*.nbm
+    
+    
+    - name: Release
+      uses: softprops/action-gh-release@v2
+      if: startsWith(github.ref, 'refs/tags/')
+      with:
+        files: org-roiderh-gcodegenerator.zip
+      
