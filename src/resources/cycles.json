@@ -83,6 +83,23 @@
 
     },
     {
+        "name": "offset",
+        "arg": [
+            {
+                "type": "real",
+                "name": "distance",
+                "defaultval": "0"
+            },
+            {
+                "type": "int",
+                "name": "control",
+                "defaultval": "0"
+            }
+
+        ]
+
+    },
+    {
         "name": "translate",
         "arg": [
             {
@@ -210,5 +227,4 @@
 
 
 ]
-
 

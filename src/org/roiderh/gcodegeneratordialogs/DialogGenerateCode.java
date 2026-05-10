@@ -30,6 +30,7 @@ import javax.swing.text.html.StyleSheet;
 import math.geom2d.circulinear.CirculinearElement2D;
 import math.geom2d.circulinear.PolyCirculinearCurve2D;
 import org.roiderh.gcodegeneratordialogs.generators.Mirror;
+import org.roiderh.gcodegeneratordialogs.generators.Offset;
 import org.roiderh.gcodegeneratordialogs.generators.Parallel;
 import org.roiderh.gcodegeneratordialogs.generators.Reverse;
 import org.roiderh.gcodegeneratordialogs.generators.Roughing;
@@ -391,6 +392,10 @@ public class DialogGenerateCode extends javax.swing.JDialog implements ActionLis
                 txtGcode = m.calculate();
             } else if (fc.name.compareTo("parallel") == 0) {
                 Parallel m = new Parallel(origCurve, fc, args);
+                txtGcode = m.calculate();
+
+            } else if (fc.name.compareTo("offset") == 0) {
+                Offset m = new Offset(origCurve, fc, args);
                 txtGcode = m.calculate();
 
             } else if (fc.name.compareTo("translate") == 0) {

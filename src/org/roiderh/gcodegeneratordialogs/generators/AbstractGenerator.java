@@ -128,7 +128,7 @@ public class AbstractGenerator {
 
             dist = Math.abs(curY - prevY) + Math.abs(curX - prevX);
             if (dist > 0.001) {
-                if (curve.toString().contains("CircleArc2D")) {
+                if (curve instanceof CircleArc2D) {
                     CircleArc2D c = (CircleArc2D) curve;
                     if (c.isDirect()) {
                         output_gcode += "G3";
